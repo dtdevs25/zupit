@@ -67,12 +67,11 @@ export const HostLobby: React.FC<HostLobbyProps> = ({
           <div className="bg-white p-2 sm:p-3 rounded-2xl shadow-xl flex flex-col items-center">
             <QRCodeSVG 
               value={joinUrl} 
-              size={110} 
+              size={112}
               bgColor="#ffffff" 
               fgColor="#321066"
               level="M"
               includeMargin={false}
-              className="rounded-lg shadow-inner w-20 h-20 sm:w-28 sm:h-28"
             />
             <span className="text-[10px] sm:text-xs font-black text-purple-900 uppercase mt-1">Escaneie</span>
           </div>

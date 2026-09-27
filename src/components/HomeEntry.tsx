@@ -53,19 +53,6 @@ export const HomeEntry: React.FC<HomeEntryProps> = ({
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] w-full px-4 py-8">
-      {/* Hero Header */}
-      <div className="text-center mb-6 max-w-xl animate-fadeIn">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-400 text-purple-950 font-black text-xs uppercase tracking-widest shadow-md mb-2">
-          <Sparkles className="w-3.5 h-3.5 fill-current" />
-          Quiz em Tempo Real
-        </div>
-        <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight">
-          Quiz<span className="text-yellow-400">Pop</span><span className="text-pink-400 animate-pulse">!</span>
-        </h1>
-        <p className="text-sm sm:text-base text-purple-200 mt-2 font-medium">
-          O clássico jogo interativo de perguntas e respostas. Digite o PIN para entrar ou crie sua própria sala!
-        </p>
-      </div>
 
       {/* Main Join Card */}
       <div className={`w-full ${step === 'pin' ? 'max-w-3xl' : 'max-w-md'} bg-[#240b4d] border-2 border-purple-700/70 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden backdrop-blur-md transition-all duration-300`}>

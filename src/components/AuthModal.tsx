@@ -81,7 +81,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <div className="space-y-6">
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              {mode === 'register' ? 'Criar Conta de Acesso' : 'Entrar no QuizPop!'}
+              {mode === 'register' ? 'Criar Conta de Acesso' : 'Entrar no ZUPiT!'}
             </h2>
             <p className="text-xs text-purple-200 mt-0.5">
               {mode === 'register'

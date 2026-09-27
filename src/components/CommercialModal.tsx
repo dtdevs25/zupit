@@ -342,7 +342,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
 
             <div className="flex items-center gap-2 shrink-0">
               <a
-                href="mailto:Dani.dk.santos@gmail.com?subject=Solicitacao%20de%20Acesso%20Comercial%20QuizPop"
+                href="mailto:Dani.dk.santos@gmail.com?subject=Solicitacao%20de%20Acesso%20Comercial%20ZUPiT"
                 className="px-3.5 py-1.5 bg-purple-900/80 hover:bg-purple-800 text-purple-200 hover:text-white rounded-lg text-xs font-bold transition-all border border-purple-700/60"
               >
                 Falar com o Master

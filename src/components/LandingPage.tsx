@@ -19,7 +19,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPin, onGoToHost
         
         <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6 animate-slideUp">
           Engaje sua audiência com o <br className="hidden md:block" />
-          <span className="text-yellow-400">QuizPop!</span>
+          <span className="text-yellow-400">ZUPiT!</span>
         </h1>
         
         <p className="text-lg md:text-xl text-purple-200 max-w-2xl mx-auto font-medium mb-10 animate-slideUp" style={{animationDelay: '100ms'}}>
@@ -54,7 +54,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPin, onGoToHost
       {/* Features Section */}
       <section className="bg-[#321066] py-16 md:py-24 px-4 border-t-4 border-purple-800/50">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-black text-center mb-16">Por que escolher o QuizPop?</h2>
+          <h2 className="text-3xl md:text-4xl font-black text-center mb-16">Por que escolher o ZUPiT!?</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-[#46178f] p-8 rounded-3xl shadow-xl border border-purple-500/30">
@@ -106,7 +106,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPin, onGoToHost
       
       {/* Footer */}
       <footer className="py-8 text-center text-sm text-purple-400 bg-[#240b4d]">
-        <p>© {new Date().getFullYear()} QuizPop - Desenvolvido para engajar.</p>
+        <p>© {new Date().getFullYear()} ZUPiT! - Desenvolvido para engajar.</p>
       </footer>
     </div>
   );

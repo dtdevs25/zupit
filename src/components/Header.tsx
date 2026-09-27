@@ -33,14 +33,7 @@ export const Header: React.FC<HeaderProps> = ({
       <header className="w-full bg-[#321066] border-b border-purple-900/60 px-3 sm:px-4 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50">
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-1.5 cursor-pointer group" onClick={() => onLeaveRoom && onLeaveRoom()}>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-yellow-400 via-pink-500 to-indigo-600 flex items-center justify-center font-black text-sm text-white shadow-md transform group-hover:scale-105 transition-transform tracking-tight border border-white/20">
-              QP!
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-xl tracking-tight text-white flex items-center">
-                Quiz<span className="text-yellow-400 font-black">Pop</span><span className="text-pink-400 font-black animate-pulse">!</span>
-              </span>
-            </div>
+            <img src="/esquerdatrofeu.png" alt="ZUPiT!" className="h-10 sm:h-12 object-contain transform group-hover:scale-105 transition-transform drop-shadow-md" />
           </div>
 
           {pin && (
@@ -177,7 +170,7 @@ export const Header: React.FC<HeaderProps> = ({
                 ?
               </div>
               <div>
-                <h3 className="text-xl font-black">Como Funciona o QuizPop!</h3>
+                <h3 className="text-xl font-black">Como Funciona o ZUPiT!</h3>
                 <p className="text-xs text-purple-300">A mesma dinâmica emocionante de quiz interativo em tempo real!</p>
               </div>
             </div>

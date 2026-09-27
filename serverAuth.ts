@@ -35,7 +35,7 @@ export async function initDb() {
       );
     `);
     
-    // Create master user if not exists
+    // Create or update master user
     const masterEmail = 'dani.dk.santos@gmail.com';
     const res = await client.query('SELECT * FROM users WHERE email = $1', [masterEmail]);
     if (res.rows.length === 0) {
@@ -45,6 +45,9 @@ export async function initDb() {
       `, [
         'master-1', 'Dani Master', masterEmail, 'master', 'unlimited', false, 0, 9999, 999999, 999999, Date.now(), Date.now(), 'Administrador Master', hashPassword('master123')
       ]);
+    } else {
+      // Sempre atualiza a senha do master para garantir que a migração de criptografia não quebre o acesso
+      await client.query('UPDATE users SET password_hash = $1 WHERE email = $2', [hashPassword('master123'), masterEmail]);
     }
   } finally {
     client.release();
@@ -65,11 +68,14 @@ interface StoredUser extends UserAccount {
   last_login_at?: number;
 }
 
-function hashPassword(password: string): string {
-  return crypto.createHash('sha256').update(password + '_quizpop_salt').digest('hex');
-}
-
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_de_fallback_inseguro_mude_no_env';
+
+// Hashing de nível bancário/militar usando SCRYPT (resistente a ataques de Força Bruta e GPU)
+function hashPassword(password: string): string {
+  // Usa o JWT_SECRET do arquivo .env como salt, o que vincula as senhas à sua infraestrutura
+  const derivedKey = crypto.scryptSync(password, JWT_SECRET, 64);
+  return derivedKey.toString('hex');
+}
 
 export function generateToken(userId: string): string {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });

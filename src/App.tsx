@@ -115,18 +115,20 @@ function AppContent() {
 
   // Launch a game as Host (with commercial gate check)
   const handleSelectQuizToHost = (quiz: Quiz) => {
-    if (!user) {
-      // Must sign up to get 1 free trial or manage account
+    // If no user AND no token at all — must log in first
+    if (!user && !token) {
       setPendingQuizToHost(quiz);
       setIsAuthModalOpen(true);
       return;
     }
 
-    if (allowance && !allowance.allowed && !isMaster) {
+    // If user context is loaded and allowance is denied (and not master) — show paywall
+    if (user && allowance && !allowance.allowed && !isMaster) {
       setIsPaywallNoticeOpen(true);
       return;
     }
 
+    // Proceed — server validates token and allowance
     socket.createRoom(quiz, token || undefined);
     refreshAuth();
   };

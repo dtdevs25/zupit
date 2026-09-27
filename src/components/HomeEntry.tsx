@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PLAYER_AVATARS, PLAYER_COLORS, CharacterConfig } from '../types';
 import { CharacterAvatar, DEFAULT_CHARACTER, getRandomCharacter } from './CharacterAvatar';
 import { AvatarCustomizer } from './AvatarCustomizer';
-import { Play, ArrowLeft, Palette, Dices } from 'lucide-react';
+import { Play, ArrowLeft, ArrowRight, Palette, Dices } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 
 interface HomeEntryProps {

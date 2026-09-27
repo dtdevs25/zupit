@@ -61,6 +61,7 @@ export function useQuizSocket(): UseQuizSocketReturn {
 
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<number | null>(null);
+  const pendingMessagesRef = useRef<object[]>([]);
   const prevPlayersCountRef = useRef<number>(0);
   const prevStateRef = useRef<string>('');
   const playerIdRef = useRef<string | null>(null);
@@ -97,6 +98,10 @@ export function useQuizSocket(): UseQuizSocketReturn {
 
       ws.onopen = () => {
         setIsConnected(true);
+        // Flush any messages that were queued before connection was ready
+        const pending = pendingMessagesRef.current;
+        pendingMessagesRef.current = [];
+        pending.forEach(msg => ws.send(JSON.stringify(msg)));
       };
 
       ws.onmessage = (event) => {
@@ -232,10 +237,15 @@ export function useQuizSocket(): UseQuizSocketReturn {
   const send = useCallback((message: object) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(message));
+    } else if (wsRef.current && wsRef.current.readyState === WebSocket.CONNECTING) {
+      // Queue the message until the connection is ready
+      pendingMessagesRef.current.push(message);
     } else {
-      setErrorMessage('Conexão perdida com o servidor. Tentando reconectar...');
+      // Not connected at all — reconnect and queue
+      pendingMessagesRef.current.push(message);
+      connectWs();
     }
-  }, []);
+  }, [connectWs]);
 
   // Host methods
   const createRoom = useCallback((quiz: Quiz, token?: string) => {

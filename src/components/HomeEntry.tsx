@@ -3,6 +3,7 @@ import { PLAYER_AVATARS, PLAYER_COLORS, CharacterConfig } from '../types';
 import { CharacterAvatar, DEFAULT_CHARACTER, getRandomCharacter } from './CharacterAvatar';
 import { AvatarCustomizer } from './AvatarCustomizer';
 import { Play, ArrowLeft, Palette, Dices } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface HomeEntryProps {
   initialPin?: string;
@@ -106,23 +107,21 @@ export const HomeEntry: React.FC<HomeEntryProps> = ({
               <div className="px-2 text-xs font-bold text-purple-300 uppercase tracking-widest absolute bg-[#240b4d]">OU</div>
             </div>
 
-            {/* Right Side: QR Code Illustration */}
+            {/* Right Side: Real QR Code */}
             <div className="flex-1 flex flex-col items-center justify-center bg-purple-900/40 rounded-2xl p-6 border border-purple-700/50 text-center">
-              <div className="w-32 h-32 bg-white rounded-xl mb-4 p-2 shadow-lg flex items-center justify-center border-4 border-yellow-400 border-dashed animate-pulse">
-                {/* Fake QR pattern */}
-                <div className="w-full h-full bg-gray-200 grid grid-cols-4 grid-rows-4 gap-1 p-1">
-                  <div className="bg-[#240b4d] rounded-sm col-span-2 row-span-2"></div>
-                  <div className="bg-[#240b4d] rounded-sm"></div>
-                  <div className="bg-[#240b4d] rounded-sm col-span-2 row-span-2 col-start-3"></div>
-                  <div className="bg-[#240b4d] rounded-sm"></div>
-                  <div className="bg-[#240b4d] rounded-sm row-start-3"></div>
-                  <div className="bg-[#240b4d] rounded-sm col-span-2 row-span-2 row-start-3"></div>
-                  <div className="bg-[#240b4d] rounded-sm col-start-4 row-start-4"></div>
-                </div>
+              <div className="bg-white rounded-xl mb-4 p-3 shadow-lg border-4 border-yellow-400 inline-block">
+                <QRCodeSVG
+                  value={typeof window !== 'undefined' ? window.location.origin : 'https://zupit.app'}
+                  size={128}
+                  bgColor="#ffffff"
+                  fgColor="#240b4d"
+                  level="M"
+                  includeMargin={false}
+                />
               </div>
               <h3 className="font-black text-yellow-300 mb-1">Câmera do Celular</h3>
               <p className="text-xs text-purple-200 leading-relaxed">
-                Aponte a câmera do seu celular para o <strong>QR Code</strong> projetado no telão para entrar instantaneamente!
+                Aponte a câmera do seu celular para o <strong>QR Code</strong> para entrar instantaneamente!
               </p>
             </div>
           </div>

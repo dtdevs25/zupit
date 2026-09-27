@@ -12,6 +12,7 @@ interface HeaderProps {
   onOpenAuth?: () => void;
   onOpenMaster?: () => void;
   onOpenPlans?: () => void;
+  onLogoutSuccess?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -24,6 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAuth,
   onOpenMaster,
   onOpenPlans,
+  onLogoutSuccess,
 }) => {
   const [showHelp, setShowHelp] = useState(false);
   const { user, isMaster, allowance, logout } = useAuth();
@@ -45,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Commercial Plans button */}
-          {onOpenPlans && (
+          {onOpenPlans && (!user || (user.planStatus !== 'basic' && user.planStatus !== 'pro' && user.planStatus !== 'unlimited' && user.role !== 'master')) && (
             <button
               onClick={onOpenPlans}
               className="w-[100px] sm:w-[120px] h-[36px] sm:h-[40px] rounded-xl text-xs sm:text-sm font-black bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-lg animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ring-2 ring-orange-500/50 shrink-0"
@@ -91,7 +93,10 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </div>
               <button
-                onClick={logout}
+                onClick={() => {
+                  logout();
+                  onLogoutSuccess?.();
+                }}
                 title="Sair da conta"
                 className="text-gray-400 hover:text-red-500 p-1 rounded transition-colors cursor-pointer text-xs"
               >

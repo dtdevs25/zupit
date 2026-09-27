@@ -167,6 +167,7 @@ function AppContent() {
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onOpenMaster={() => setIsMasterModalOpen(true)}
         onOpenPlans={() => setIsPlansModalOpen(true)}
+        onLogoutSuccess={() => setCurrentView('landing')}
       />
 
       {/* Error notification toast */}

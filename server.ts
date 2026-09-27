@@ -1119,6 +1119,86 @@ app.get('/api/admin/metrics', async (req, res) => {
   res.json(await getAdminMetrics());
 });
 
+// ==========================================
+// AI Quiz Generation
+// ==========================================
+const ai = process.env.GEMINI_API_KEY ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) : null;
+
+app.post('/api/generate-quiz', async (req, res) => {
+  const { topic, questionCount = 5, difficulty = 'médio' } = req.body;
+  
+  if (!ai) {
+    // Mock if no API key provided
+    return res.json({
+      quiz: {
+        id: `ai-${Date.now()}`,
+        title: `Quiz sobre ${topic}`,
+        description: `Quiz simulado sobre ${topic} (Sem API Key)`,
+        questions: Array.from({ length: questionCount }).map((_, i) => ({
+          id: `q${i + 1}`,
+          text: `Pergunta simulada ${i + 1} sobre ${topic}?`,
+          timeLimit: 20,
+          options: [
+            { id: 'a', text: 'Opção A', color: 'bg-red-500', shape: 'triangle' },
+            { id: 'b', text: 'Opção correta', color: 'bg-blue-500', shape: 'diamond' },
+            { id: 'c', text: 'Opção C', color: 'bg-yellow-400', shape: 'circle' },
+            { id: 'd', text: 'Opção D', color: 'bg-green-500', shape: 'square' },
+          ],
+          correctOptionId: 'b',
+        })),
+      },
+    });
+  }
+
+  try {
+    const prompt = `Gere um quiz educativo em formato JSON sobre o tema "${topic}".
+Nível de dificuldade: ${difficulty}.
+Número de perguntas: ${questionCount}.
+
+O JSON de retorno DEVE seguir OBRIGATORIAMENTE esta estrutura e usar IDs de a,b,c,d para as opções e manter essa correspondência de cores e shapes:
+
+{
+  "id": "ai-${Date.now()}",
+  "title": "Título do Quiz",
+  "description": "Breve descrição",
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Texto da pergunta",
+      "timeLimit": 20,
+      "options": [
+        { "id": "a", "text": "Resposta A", "color": "bg-red-500", "shape": "triangle" },
+        { "id": "b", "text": "Resposta B", "color": "bg-blue-500", "shape": "diamond" },
+        { "id": "c", "text": "Resposta C", "color": "bg-yellow-400", "shape": "circle" },
+        { "id": "d", "text": "Resposta D", "color": "bg-green-500", "shape": "square" }
+      ],
+      "correctOptionId": "a" // id da correta (a, b, c ou d)
+    }
+  ]
+}
+
+RETORNE APENAS O JSON VÁLIDO. Nenhuma outra formatação (SEM CRASES de markdown).`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [prompt],
+    });
+
+    let resultText = response.text || '';
+    if (resultText.startsWith('\`\`\`json')) {
+      resultText = resultText.replace(/^\`\`\`json\n?/, '').replace(/\n?\`\`\`$/, '');
+    } else if (resultText.startsWith('\`\`\`')) {
+      resultText = resultText.replace(/^\`\`\`\n?/, '').replace(/\n?\`\`\`$/, '');
+    }
+
+    const quizData = JSON.parse(resultText);
+    res.json({ quiz: quizData });
+  } catch (err: any) {
+    console.error('Error generating AI quiz:', err);
+    res.status(500).json({ error: 'Falha ao gerar quiz.' });
+  }
+});
+
 // Vite middleware in dev or static files in prod
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {

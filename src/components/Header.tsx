@@ -30,15 +30,15 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="w-full bg-[#321066] border-b border-purple-900/60 px-3 sm:px-4 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50">
+      <header className="w-full bg-white border-b border-gray-200 px-3 sm:px-4 py-3 flex items-center justify-between shadow-md sticky top-0 z-50">
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-1.5 cursor-pointer group" onClick={() => onLeaveRoom && onLeaveRoom()}>
             <img src="/esquerdatrofeu.png" alt="ZUPiT!" className="h-10 sm:h-12 object-contain transform group-hover:scale-105 transition-transform drop-shadow-md" />
           </div>
 
           {pin && (
-            <div className="hidden sm:flex items-center bg-purple-900/80 px-3 py-1 rounded-full border border-purple-700/60 text-xs font-bold text-purple-200">
-              PIN: <span className="text-yellow-300 ml-1.5 font-mono text-sm tracking-wider">{pin}</span>
+            <div className="hidden sm:flex items-center bg-gray-100 px-3 py-1 rounded-full border border-gray-200 text-xs font-bold text-gray-600">
+              PIN: <span className="text-purple-700 ml-1.5 font-mono text-sm tracking-wider">{pin}</span>
             </div>
           )}
         </div>
@@ -48,9 +48,9 @@ export const Header: React.FC<HeaderProps> = ({
           {onOpenPlans && (
             <button
               onClick={onOpenPlans}
-              className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-800/80 hover:bg-purple-700 text-yellow-300 border border-yellow-400/30 flex items-center gap-1 transition-all cursor-pointer"
+              className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold bg-yellow-50 hover:bg-yellow-100 text-yellow-700 border border-yellow-200 flex items-center gap-1 transition-all cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
+              <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
               <span className="hidden sm:inline">Planos & Preços</span>
               <span className="sm:hidden">Planos</span>
             </button>
@@ -71,13 +71,13 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* User profile or Login trigger */}
           {user ? (
-            <div className="flex items-center gap-1.5 bg-purple-900/80 px-2 sm:px-2.5 py-1 rounded-xl border border-purple-700/70 text-xs text-purple-200">
-              <div className="w-6 h-6 rounded-full bg-purple-800 flex items-center justify-center font-bold text-[10px] text-white">
+            <div className="flex items-center gap-1.5 bg-gray-100 px-2 sm:px-2.5 py-1 rounded-xl border border-gray-200 text-xs text-gray-700">
+              <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center font-bold text-[10px] text-white">
                 {isMaster ? '👑' : user.name.slice(0, 1).toUpperCase()}
               </div>
               <div className="hidden md:flex flex-col text-left leading-tight">
-                <span className="font-bold text-white max-w-[100px] truncate">{user.name}</span>
-                <span className="text-[10px] text-yellow-300">
+                <span className="font-bold text-gray-900 max-w-[100px] truncate">{user.name}</span>
+                <span className="text-[10px] text-purple-600">
                   {isMaster
                     ? 'Master Total'
                     : user.planStatus === 'pro' || user.planStatus === 'unlimited'
@@ -94,7 +94,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={logout}
                 title="Sair da conta"
-                className="text-purple-400 hover:text-white p-1 rounded transition-colors cursor-pointer text-xs"
+                className="text-gray-400 hover:text-red-500 p-1 rounded transition-colors cursor-pointer text-xs"
               >
                 ✕
               </button>
@@ -118,7 +118,7 @@ export const Header: React.FC<HeaderProps> = ({
               className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                 isSplitScreen
                   ? 'bg-yellow-400 text-purple-950 shadow-md font-extrabold ring-2 ring-yellow-300'
-                  : 'bg-purple-800/80 hover:bg-purple-700 text-purple-200 border border-purple-700/50'
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200'
               }`}
             >
               <Columns className="w-4 h-4" />
@@ -129,15 +129,15 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onToggleSound}
             title={soundEnabled ? 'Silenciar som' : 'Ativar som'}
-            className="p-2 rounded-lg bg-purple-800/80 hover:bg-purple-700 text-purple-200 border border-purple-700/50 transition-colors"
+            className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-200 transition-colors"
           >
-            {soundEnabled ? <Volume2 className="w-5 h-5 text-yellow-400" /> : <VolumeX className="w-5 h-5 text-gray-400" />}
+            {soundEnabled ? <Volume2 className="w-5 h-5 text-purple-600" /> : <VolumeX className="w-5 h-5 text-gray-400" />}
           </button>
 
           <button
             onClick={() => setShowHelp(true)}
             title="Como jogar"
-            className="p-2 rounded-lg bg-purple-800/80 hover:bg-purple-700 text-purple-200 border border-purple-700/50 transition-colors"
+            className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-200 transition-colors"
           >
             <HelpCircle className="w-5 h-5" />
           </button>

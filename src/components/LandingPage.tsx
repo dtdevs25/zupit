@@ -11,42 +11,53 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPin, onGoToHost
   return (
     <div className="min-h-[calc(100vh-65px)] bg-[#46178f] flex flex-col text-white font-['Montserrat',sans-serif] overflow-y-auto">
       {/* Hero Section */}
-      <section className="flex-1 flex flex-col items-center justify-center text-center px-4 py-16 md:py-24">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-400 text-purple-950 font-black text-sm uppercase tracking-widest shadow-md mb-6 animate-fadeIn">
-          <Star className="w-4 h-4 fill-current" />
-          A Plataforma Definitiva de Quizzes
+      <section className="flex-1 flex flex-col md:flex-row items-center justify-between max-w-6xl mx-auto px-4 py-16 md:py-24 gap-10">
+        {/* Left Column: Image */}
+        <div className="flex-1 w-full animate-fadeInLeft flex justify-center md:justify-end order-2 md:order-1">
+          <img 
+            src="/superiortrofeu.png" 
+            alt="ZUPiT! Troféu" 
+            className="w-full max-w-[280px] md:max-w-md object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500" 
+          />
         </div>
-        
-        <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6 animate-slideUp">
-          Engaje sua audiência com o <br className="hidden md:block" />
-          <span className="text-yellow-400">ZUPiT!</span>
-        </h1>
-        
-        <p className="text-lg md:text-xl text-purple-200 max-w-2xl mx-auto font-medium mb-10 animate-slideUp" style={{animationDelay: '100ms'}}>
-          Crie testes interativos, aulas dinâmicas e treinamentos divertidos em segundos com o poder da Inteligência Artificial. Seus participantes usam apenas o celular para jogar!
-        </p>
 
-        <div className="flex flex-col items-center gap-6 w-full max-w-lg mx-auto animate-slideUp" style={{animationDelay: '200ms'}}>
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
-            <button
-              onClick={onEnterPin}
-              className="w-full py-4 px-6 bg-white hover:bg-gray-100 text-[#46178f] font-black text-lg rounded-2xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2"
-            >
-              <Play className="w-5 h-5 fill-current" />
-              Inserir PIN do Jogo
-            </button>
-            
-            <button
-              onClick={onGoToHost}
-              className="w-full py-4 px-6 bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-lg rounded-2xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2"
-            >
-              Criar meu Quiz
-              <ArrowRight className="w-5 h-5" />
-            </button>
+        {/* Right Column: Text & CTA */}
+        <div className="flex-1 w-full text-center md:text-left animate-fadeInRight order-1 md:order-2">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-400 text-purple-950 font-black text-sm uppercase tracking-widest shadow-md mb-6">
+            <Star className="w-4 h-4 fill-current" />
+            A Plataforma Definitiva de Quizzes
           </div>
           
-          <div className="text-sm text-purple-300 bg-[#321066]/50 px-6 py-3 rounded-full border border-purple-500/30 flex items-center gap-2">
-            📸 <span className="font-medium">Dica: Ou aponte a câmera do celular para o <strong>QR Code</strong> na tela!</span>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 leading-tight text-white">
+            Engaje sua equipe com quizes em <span className="text-yellow-400 underline decoration-wavy">tempo real.</span>
+          </h1>
+          
+          <p className="text-lg text-purple-200 font-medium mb-10 leading-relaxed max-w-lg mx-auto md:mx-0">
+            Transforme treinamentos, aulas e reuniões tediosas em um <strong>verdadeiro espetáculo interativo!</strong> Nossa IA cria o quiz em segundos e seus participantes jogam pelo celular. <span className="text-pink-300 font-bold">100% adrenalina.</span>
+          </p>
+
+          <div className="flex flex-col gap-6 w-full max-w-lg mx-auto md:mx-0">
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
+              <button
+                onClick={onEnterPin}
+                className="w-full py-4 px-6 bg-white hover:bg-gray-100 text-[#46178f] font-black text-lg rounded-2xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2"
+              >
+                <Play className="w-5 h-5 fill-current" />
+                Inserir PIN
+              </button>
+              
+              <button
+                onClick={onGoToHost}
+                className="w-full py-4 px-6 bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-lg rounded-2xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2"
+              >
+                Criar Quiz Grátis
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="text-sm text-purple-300 bg-[#321066]/50 px-6 py-3 rounded-full border border-purple-500/30 flex items-center justify-center md:justify-start gap-2 shadow-inner">
+              📸 <span className="font-medium">Ou aponte a câmera para o <strong>QR Code</strong> da tela!</span>
+            </div>
           </div>
         </div>
       </section>

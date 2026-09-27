@@ -8,20 +8,16 @@ interface HomeEntryProps {
   initialPin?: string;
   onJoinGame: (pin: string, nickname: string, avatar: string, color: string, avatarConfig?: CharacterConfig) => void;
   onGoToHost: () => void;
-  onToggleSplitScreen: () => void;
+  onGoBack: () => void;
   isConnecting?: boolean;
-  onOpenPlans?: () => void;
-  onOpenAuth?: () => void;
 }
 
 export const HomeEntry: React.FC<HomeEntryProps> = ({
   initialPin = '',
   onJoinGame,
   onGoToHost,
-  onToggleSplitScreen,
+  onGoBack,
   isConnecting = false,
-  onOpenPlans,
-  onOpenAuth,
 }) => {
   const [pin, setPin] = useState(initialPin);
   const [nickname, setNickname] = useState('');
@@ -183,36 +179,14 @@ export const HomeEntry: React.FC<HomeEntryProps> = ({
         )}
       </div>
 
-      {/* Commercial & Free Trial Promo Banner */}
-      <div className="mt-5 w-full max-w-md bg-purple-900/50 border border-purple-700/70 rounded-2xl p-3.5 flex items-center justify-between gap-3 text-xs text-purple-200 backdrop-blur-sm">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-yellow-400/20 text-yellow-300 flex items-center justify-center font-bold shrink-0">
-            🎁
-          </div>
-          <div>
-            <span className="font-bold text-white block">Quer apresentar para sua turma?</span>
-            <span className="text-[11px] text-purple-300">Ganhe 1 quiz grátis no cadastro (até 15 participantes).</span>
-          </div>
-        </div>
-        {onOpenPlans && (
-          <button
-            onClick={onOpenPlans}
-            className="px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-[11px] rounded-lg shadow transition-all shrink-0 cursor-pointer"
-          >
-            Ver Planos
-          </button>
-        )}
-      </div>
-
-      {/* Quick Action Cards & Demo Bar */}
+      {/* Quick Action Cards */}
       <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-2xl px-2">
         <button
-          onClick={onToggleSplitScreen}
-          className="w-full sm:w-auto flex-1 py-4 px-5 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-purple-950 font-black text-sm flex items-center justify-center gap-2.5 shadow-xl transition-transform active:scale-95 cursor-pointer ring-4 ring-yellow-400/30"
-          title="Permite testar o Host e o Jogador lado a lado no mesmo navegador"
+          onClick={onGoBack}
+          className="w-full sm:w-auto flex-1 py-4 px-5 rounded-2xl bg-white/10 hover:bg-white/20 border-2 border-purple-500/60 text-white font-extrabold text-sm flex items-center justify-center gap-2.5 shadow-xl transition-transform active:scale-95 cursor-pointer"
         >
-          <Columns className="w-5 h-5 text-purple-950 stroke-[2.5]" />
-          <span>Testar Agora (Dividir Tela Host + Celular)</span>
+          <ArrowRight className="w-5 h-5 rotate-180" />
+          <span>Voltar ao Início</span>
         </button>
 
         <button
@@ -220,12 +194,12 @@ export const HomeEntry: React.FC<HomeEntryProps> = ({
           className="w-full sm:w-auto flex-1 py-4 px-5 rounded-2xl bg-[#321066] hover:bg-[#3d147d] border-2 border-purple-500/60 text-white font-extrabold text-sm flex items-center justify-center gap-2.5 shadow-xl transition-transform active:scale-95 cursor-pointer"
         >
           <Tv className="w-5 h-5 text-yellow-400" />
-          <span>Biblioteca de Quizzes (Apresentar)</span>
+          <span>Acessar Painel (Criar/Hospedar)</span>
         </button>
       </div>
 
       {/* Footnote tips */}
-      <div className="mt-6 text-center text-xs text-purple-300/80 max-w-md">
+      <div className="mt-6 text-center text-xs text-purple-300/80 max-w-md px-4">
         💡 <strong className="text-purple-200">Dica:</strong> Você pode personalizar seu avatar com óculos, bonés, penteados e roupas para se destacar no placar e no pódio!
       </div>
 

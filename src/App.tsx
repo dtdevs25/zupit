@@ -9,6 +9,7 @@ import { DEFAULT_QUIZZES } from './data/defaultQuizzes';
 import { Quiz } from './types';
 import { Header } from './components/Header';
 import { HomeEntry } from './components/HomeEntry';
+import { LandingPage } from './components/LandingPage';
 import { QuizSelector } from './components/QuizManager/QuizSelector';
 import { QuizBuilder } from './components/QuizManager/QuizBuilder';
 import { AIGeneratorModal } from './components/QuizManager/AIGeneratorModal';
@@ -56,7 +57,7 @@ function AppContent() {
   });
 
   // Navigation
-  const [currentView, setCurrentView] = useState<'home' | 'quizzes' | 'split'>('home');
+  const [currentView, setCurrentView] = useState<'landing' | 'home' | 'quizzes' | 'split'>('landing');
   const [urlPin, setUrlPin] = useState<string>('');
 
   // Modals
@@ -157,8 +158,8 @@ function AppContent() {
         onToggleSound={socket.toggleSound}
         onLeaveRoom={activeRoom ? socket.leaveRoom : undefined}
         onToggleSplitScreen={
-          !activeRoom
-            ? () => setCurrentView(currentView === 'split' ? 'home' : 'split')
+          !activeRoom && isMaster
+            ? () => setCurrentView(currentView === 'split' ? 'landing' : 'split')
             : undefined
         }
         isSplitScreen={currentView === 'split'}
@@ -307,6 +308,18 @@ function AppContent() {
                 onOpenAIGenerator={() => setIsAIGeneratorOpen(true)}
                 onBackToHome={() => setCurrentView('home')}
               />
+            ) : currentView === 'landing' ? (
+              <LandingPage
+                onEnterPin={() => setCurrentView('home')}
+                onGoToHost={() => {
+                  if (!user) {
+                    setIsAuthModalOpen(true);
+                  } else {
+                    setCurrentView('quizzes');
+                  }
+                }}
+                onOpenPlans={() => setIsPlansModalOpen(true)}
+              />
             ) : (
               <HomeEntry
                 initialPin={urlPin}
@@ -314,9 +327,7 @@ function AppContent() {
                   socket.joinRoom(pin, nickname, avatar, color, avatarConfig);
                 }}
                 onGoToHost={() => setCurrentView('quizzes')}
-                onToggleSplitScreen={() => setCurrentView('split')}
-                onOpenPlans={() => setIsPlansModalOpen(true)}
-                onOpenAuth={() => setIsAuthModalOpen(true)}
+                onGoBack={() => setCurrentView('landing')}
               />
             )}
           </>

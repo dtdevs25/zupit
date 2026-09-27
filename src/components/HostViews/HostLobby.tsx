@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { RoomState } from '../../types';
 import { CharacterAvatar } from '../CharacterAvatar';
 import { Users, Bot, Play, Copy, Check, QrCode, Sparkles, X } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface HostLobbyProps {
   room: RoomState;
@@ -17,7 +18,6 @@ export const HostLobby: React.FC<HostLobbyProps> = ({
   onKickPlayer,
 }) => {
   const [copied, setCopied] = useState(false);
-  const [showQr, setShowQr] = useState(false);
 
   const formattedPin = room.pin.length === 6 
     ? `${room.pin.slice(0, 3)} ${room.pin.slice(3)}` 
@@ -49,53 +49,35 @@ export const HostLobby: React.FC<HostLobbyProps> = ({
           </span>
         </div>
 
-        {/* Huge PIN card */}
-        <div className="flex items-center gap-3">
+        {/* Huge PIN card and QR Code */}
+        <div className="flex items-center gap-4 sm:gap-6">
           <div 
             onClick={copyPin}
-            className="bg-white hover:bg-yellow-50 text-[#321066] cursor-pointer px-6 sm:px-10 py-3 sm:py-4 rounded-2xl shadow-xl flex items-center gap-4 transition-transform active:scale-95 group"
+            className="bg-white hover:bg-yellow-50 text-[#321066] cursor-pointer px-6 sm:px-10 py-3 sm:py-5 rounded-2xl shadow-xl flex items-center gap-4 transition-transform active:scale-95 group"
             title="Clique para copiar o PIN"
           >
-            <span className="font-mono font-black text-3xl sm:text-5xl tracking-widest text-[#240b4d]">
+            <span className="font-mono font-black text-4xl sm:text-6xl tracking-widest text-[#240b4d]">
               {formattedPin}
             </span>
-            <button className="text-purple-600 group-hover:text-purple-900 transition-colors">
-              {copied ? <Check className="w-6 h-6 text-green-600" /> : <Copy className="w-6 h-6" />}
+            <button className="text-purple-600 group-hover:text-purple-900 transition-colors hidden sm:block">
+              {copied ? <Check className="w-8 h-8 text-green-600" /> : <Copy className="w-8 h-8" />}
             </button>
           </div>
 
-          <button
-            onClick={() => setShowQr(!showQr)}
-            className="p-4 bg-purple-800/80 hover:bg-purple-700 border border-purple-600/50 rounded-2xl text-purple-200 transition-colors shadow-lg"
-            title="Exibir QR Code"
-          >
-            <QrCode className="w-7 h-7" />
-          </button>
+          <div className="bg-white p-2 sm:p-3 rounded-2xl shadow-xl flex flex-col items-center">
+            <QRCodeSVG 
+              value={joinUrl} 
+              size={110} 
+              bgColor="#ffffff" 
+              fgColor="#321066"
+              level="M"
+              includeMargin={false}
+              className="rounded-lg shadow-inner w-20 h-20 sm:w-28 sm:h-28"
+            />
+            <span className="text-[10px] sm:text-xs font-black text-purple-900 uppercase mt-1">Escaneie</span>
+          </div>
         </div>
       </div>
-
-      {/* QR Code Popup */}
-      {showQr && (
-        <div className="my-4 bg-white p-6 rounded-2xl shadow-2xl flex flex-col items-center gap-3 text-purple-950 animate-bounce-short">
-          <div className="p-3 bg-purple-50 rounded-xl border border-purple-200">
-            {/* Direct Google Charts QR code or visual placeholder */}
-            <img 
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(joinUrl)}`}
-              alt="QR Code do Jogo"
-              className="w-44 h-44 rounded-lg shadow-inner"
-            />
-          </div>
-          <p className="text-xs font-bold text-purple-900 text-center">
-            Aponte a câmera do celular para entrar direto com o PIN!
-          </p>
-          <button 
-            onClick={() => setShowQr(false)}
-            className="text-xs font-bold text-purple-700 hover:text-purple-950 underline"
-          >
-            Fechar
-          </button>
-        </div>
-      )}
 
       {/* Center Section: Players Joined */}
       <div className="w-full my-8 flex-1 flex flex-col items-center">

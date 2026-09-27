@@ -37,6 +37,7 @@ import { AuthModal } from './components/AuthModal';
 import { CommercialModal } from './components/CommercialModal';
 import { MasterAdminModal } from './components/MasterAdminModal';
 import { PaywallNoticeModal } from './components/PaywallNoticeModal';
+import { WhatsAppWidget } from './components/WhatsAppWidget';
 
 function AppContent() {
   const socket = useQuizSocket();
@@ -381,6 +382,9 @@ function AppContent() {
           setIsAuthModalOpen(true);
         }}
       />
+
+      {/* Global WhatsApp Widget */}
+      <WhatsAppWidget />
     </div>
   );
 }

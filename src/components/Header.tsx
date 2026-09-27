@@ -48,9 +48,9 @@ export const Header: React.FC<HeaderProps> = ({
           {onOpenPlans && (
             <button
               onClick={onOpenPlans}
-              className="px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-black bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-lg animate-pulse ring-2 ring-orange-500/50"
+              className="w-[100px] sm:w-[120px] h-[36px] sm:h-[40px] rounded-xl text-xs sm:text-sm font-black bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-lg animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ring-2 ring-orange-500/50 shrink-0"
             >
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-4 h-4 shrink-0" />
               <span className="inline">Planos</span>
             </button>
           )}
@@ -102,9 +102,9 @@ export const Header: React.FC<HeaderProps> = ({
             onOpenAuth && (
               <button
                 onClick={onOpenAuth}
-                className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold bg-yellow-400 hover:bg-yellow-300 text-purple-950 shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+                className="w-[100px] sm:w-[120px] h-[36px] sm:h-[40px] rounded-xl text-xs sm:text-sm font-black bg-yellow-400 hover:bg-yellow-300 text-purple-950 flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-lg shrink-0"
               >
-                <User className="w-3.5 h-3.5" />
+                <User className="w-4 h-4 shrink-0" />
                 <span>Login</span>
               </button>
             )

@@ -51,43 +51,34 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   const handleQuickMaster = async () => {
-    setError(null);
-    setLoading(true);
-    try {
-      await quickLoginMaster();
-      onSuccess?.();
-      onClose();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    // Feature removida por segurança
   };
 
   return (
-    <div className="fixed inset-0 bg-[#2b0d5c] flex items-center justify-center p-4 z-50 animate-fadeIn overflow-y-auto">
-      <div className="bg-[#1a0538] border border-purple-700/80 rounded-3xl max-w-lg w-full flex flex-col p-6 sm:p-10 text-white shadow-2xl relative overflow-hidden my-auto">
+    <div className="fixed inset-0 bg-[#1a0538] flex items-center justify-center p-0 z-50 animate-fadeIn overflow-y-auto">
+      <div className="w-full min-h-screen flex flex-col p-6 sm:p-10 text-white relative overflow-hidden items-center justify-center">
         {/* Glow decoration */}
-        <div className="absolute -top-20 -right-20 w-44 h-44 bg-yellow-400/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-20 -left-20 w-44 h-44 bg-pink-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-400/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-pink-500/10 rounded-full blur-[100px] pointer-events-none" />
 
-        {/* Header bar with close button */}
-        <div className="flex items-center justify-between pb-3 border-b border-purple-800/60 relative z-10 shrink-0">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-yellow-400 text-purple-950 font-black text-[11px] uppercase tracking-wider shadow-md">
-            <Sparkles className="w-3.5 h-3.5 fill-current" />
-            1 Quiz Grátis (Até 15 Participantes)
+        <div className="w-full max-w-md relative z-10 flex flex-col gap-6">
+          {/* Header bar with close button */}
+          <div className="flex items-center justify-between pb-3 border-b border-purple-800/60 shrink-0">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-400 text-purple-950 font-black text-[11px] sm:text-xs uppercase tracking-wider shadow-md">
+              <Sparkles className="w-4 h-4 fill-current" />
+              1 Quiz Grátis (Até 15 Participantes)
+            </div>
+
+            <button
+              onClick={onClose}
+              className="text-purple-300 hover:text-white p-2 rounded-xl hover:bg-purple-800/50 transition-colors cursor-pointer"
+            >
+              <X className="w-6 h-6" />
+            </button>
           </div>
 
-          <button
-            onClick={onClose}
-            className="text-purple-300 hover:text-white p-1.5 rounded-xl hover:bg-purple-800/50 transition-colors cursor-pointer"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Scrollable Form Body */}
-        <div className="overflow-y-auto pt-3 pb-1 pr-1 space-y-3 relative z-10">
+          {/* Form Body */}
+          <div className="space-y-6">
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
               {mode === 'register' ? 'Criar Conta de Acesso' : 'Entrar no QuizPop!'}
@@ -104,22 +95,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="button"
               onClick={() => { setMode('register'); setError(null); }}
-              className={`py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                mode === 'register' ? 'bg-yellow-400 text-purple-950 shadow-md font-black' : 'text-purple-300 hover:text-white'
+              className={`py-3 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                mode === 'register' ? 'bg-yellow-400 text-purple-950 shadow-md font-black' : 'text-purple-300 hover:bg-purple-900/40 hover:text-white'
               }`}
             >
-              <UserPlus className="w-3.5 h-3.5" />
-              Criar Conta
+              <UserPlus className="w-4 h-4" />
+              Primeiro Acesso
             </button>
             <button
               type="button"
               onClick={() => { setMode('login'); setError(null); }}
-              className={`py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                mode === 'login' ? 'bg-yellow-400 text-purple-950 shadow-md font-black' : 'text-purple-300 hover:text-white'
+              className={`py-3 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                mode === 'login' ? 'bg-yellow-400 text-purple-950 shadow-md font-black' : 'text-purple-300 hover:bg-purple-900/40 hover:text-white'
               }`}
             >
-              <LogIn className="w-3.5 h-3.5" />
-              Já Tenho Conta
+              <LogIn className="w-4 h-4" />
+              Fazer Login
             </button>
           </div>
 
@@ -189,18 +180,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               {loading ? 'Processando...' : mode === 'register' ? 'Criar Conta Grátis' : 'Entrar na Conta'}
             </button>
           </form>
-
-          {/* Master quick button */}
-          <div className="pt-2.5 border-t border-purple-800/80 text-center">
-            <button
-              type="button"
-              onClick={handleQuickMaster}
-              disabled={loading}
-              className="w-full py-1.5 px-3 bg-purple-900/50 hover:bg-purple-800/80 border border-purple-600/60 rounded-xl text-xs font-bold text-yellow-300 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-            >
-              <Crown className="w-3.5 h-3.5 text-yellow-400" />
-              <span>Acessar como Master (Dani)</span>
-            </button>
           </div>
         </div>
       </div>

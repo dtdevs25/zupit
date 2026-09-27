@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, UserPlus, LogIn, Crown, Sparkles, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { X, Eye, EyeOff, ShieldAlert, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface AuthModalProps {
@@ -12,14 +12,15 @@ interface AuthModalProps {
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
-  defaultMode = 'register',
+  defaultMode = 'login',
   onSuccess,
 }) => {
-  const { login, register, quickLoginMaster } = useAuth();
+  const { login, register } = useAuth();
   const [mode, setMode] = useState<'login' | 'register'>(defaultMode);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -50,136 +51,119 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  const handleQuickMaster = async () => {
-    // Feature removida por segurança
-  };
-
   return (
-    <div className="fixed inset-0 bg-[#1a0538] flex items-center justify-center p-0 z-50 animate-fadeIn overflow-y-auto">
-      <div className="w-full min-h-screen flex flex-col p-6 sm:p-10 text-white relative overflow-hidden items-center justify-center">
-        {/* Glow decoration */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-400/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-pink-500/10 rounded-full blur-[100px] pointer-events-none" />
+    <div className="fixed inset-0 bg-[#46178f] flex items-center justify-center p-4 sm:p-6 z-[100] animate-fadeIn overflow-y-auto">
+      {/* Close button on the top right of the screen */}
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/70 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer z-10"
+      >
+        <X className="w-8 h-8" />
+      </button>
 
-        <div className="w-full max-w-md relative z-10 flex flex-col gap-6">
-          {/* Header bar with close button */}
-          <div className="flex items-center justify-between pb-3 border-b border-purple-800/60 shrink-0">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-400 text-purple-950 font-black text-[11px] sm:text-xs uppercase tracking-wider shadow-md">
-              <Sparkles className="w-4 h-4 fill-current" />
-              1 Quiz Grátis (Até 15 Participantes)
-            </div>
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl relative overflow-hidden flex flex-col my-auto">
+        {/* Header / Logo Area */}
+        <div className="pt-10 pb-6 px-8 flex flex-col items-center border-b border-gray-100 bg-gray-50/50">
+          <img src="/superiortrofeu.png" alt="ZUPiT! Logo" className="h-20 object-contain mb-4 drop-shadow-md" />
+          <h2 className="text-2xl font-black text-[#321066] tracking-tight">
+            {mode === 'login' ? 'Bem-vindo de volta!' : 'Crie sua conta'}
+          </h2>
+          <p className="text-sm text-gray-500 mt-1 text-center font-medium">
+            {mode === 'login' 
+              ? 'Acesse o ZUPiT! para gerenciar seus quizzes.' 
+              : 'Comece agora a engajar sua equipe!'}
+          </p>
+        </div>
 
-            <button
-              onClick={onClose}
-              className="text-purple-300 hover:text-white p-2 rounded-xl hover:bg-purple-800/50 transition-colors cursor-pointer"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* Form Body */}
-          <div className="space-y-6">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              {mode === 'register' ? 'Criar Conta de Acesso' : 'Entrar no ZUPiT!'}
-            </h2>
-            <p className="text-xs text-purple-200 mt-0.5">
-              {mode === 'register'
-                ? 'Cadastre-se e ganhe 1 quiz completo com até 15 participantes para testar!'
-                : 'Acesse para gerenciar seus quizzes e abrir salas de jogo.'}
-            </p>
-          </div>
-
-          {/* Mode switcher tabs */}
-          <div className="grid grid-cols-2 gap-1 bg-[#1a0738] p-1 rounded-xl border border-purple-800/80">
-            <button
-              type="button"
-              onClick={() => { setMode('register'); setError(null); }}
-              className={`py-3 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                mode === 'register' ? 'bg-yellow-400 text-purple-950 shadow-md font-black' : 'text-purple-300 hover:bg-purple-900/40 hover:text-white'
-              }`}
-            >
-              <UserPlus className="w-4 h-4" />
-              Primeiro Acesso
-            </button>
-            <button
-              type="button"
-              onClick={() => { setMode('login'); setError(null); }}
-              className={`py-3 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                mode === 'login' ? 'bg-yellow-400 text-purple-950 shadow-md font-black' : 'text-purple-300 hover:bg-purple-900/40 hover:text-white'
-              }`}
-            >
-              <LogIn className="w-4 h-4" />
-              Fazer Login
-            </button>
-          </div>
-
+        {/* Form Area */}
+        <div className="p-8">
           {error && (
-            <div className="p-2.5 rounded-xl bg-red-900/60 border border-red-500/50 text-red-200 text-xs flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 shrink-0 text-red-400" />
-              <span>{error}</span>
+            <div className="mb-6 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-center gap-2">
+              <ShieldAlert className="w-5 h-5 shrink-0" />
+              <span className="font-medium">{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {mode === 'register' && (
               <div>
-                <label className="block text-sm font-bold text-purple-200 mb-2">Seu Nome / Apelido</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1.5">Nome completo</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Ex: Prof. Camila Rocha"
-                  className="w-full bg-[#160530] border-2 border-purple-700/60 rounded-2xl px-4 py-3.5 text-base text-white placeholder-purple-400/50 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  placeholder="Seu nome"
+                  className="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/20 transition-all font-medium"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-bold text-purple-200 mb-2">E-mail</label>
+              <label className="block text-sm font-bold text-gray-700 mb-1.5">E-mail</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="seuemail@exemplo.com"
-                className="w-full bg-[#160530] border-2 border-purple-700/60 rounded-2xl px-4 py-3.5 text-base text-white placeholder-purple-400/50 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                placeholder="seu@email.com"
+                className="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/20 transition-all font-medium"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-purple-200 mb-2">Senha</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-[#160530] border-2 border-purple-700/60 rounded-2xl px-4 py-3.5 text-base text-white placeholder-purple-400/50 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              />
-            </div>
-
-            {mode === 'register' && (
-              <div className="bg-purple-900/40 p-2.5 rounded-xl border border-purple-800 text-xs text-purple-200 space-y-1">
-                <div className="flex items-center gap-1.5 text-yellow-300 font-bold text-[11px]">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  1 Quiz Grátis (Limite de até 15 participantes)
-                </div>
-                <p className="text-[11px] text-purple-300 leading-snug">
-                  Apresente 1 quiz completo com até 15 participantes sem pagar nada. Depois, renove com o Pacote Básico (R$ 8,99) ou Pacote Master (R$ 18,99).
-                </p>
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="block text-sm font-bold text-gray-700">Senha</label>
+                {mode === 'login' && (
+                  <button type="button" className="text-xs font-bold text-purple-600 hover:text-purple-800 transition-colors cursor-pointer">
+                    Esqueci a senha
+                  </button>
+                )}
               </div>
-            )}
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-white border-2 border-gray-200 rounded-xl pl-4 pr-12 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/20 transition-all font-medium"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 mt-2 bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-300 hover:to-amber-300 text-purple-950 font-black text-lg rounded-2xl shadow-xl transition-all cursor-pointer disabled:opacity-50 active:scale-98"
+              className="w-full py-4 mt-2 bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-lg rounded-xl shadow-lg transition-transform active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
             >
-              {loading ? 'Processando...' : mode === 'register' ? 'Criar Conta Grátis' : 'Entrar na Conta'}
+              {loading ? 'Aguarde...' : mode === 'register' ? 'Criar minha conta' : 'Entrar'}
+              {!loading && <ArrowRight className="w-5 h-5" />}
             </button>
           </form>
+
+          {/* Footer toggle */}
+          <div className="mt-8 text-center border-t border-gray-100 pt-6">
+            <p className="text-sm text-gray-600 font-medium">
+              {mode === 'login' ? 'Ainda não tem acesso?' : 'Já possui uma conta?'}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setMode(mode === 'login' ? 'register' : 'login');
+                setError(null);
+              }}
+              className="mt-2 text-purple-700 font-bold hover:text-purple-900 transition-colors cursor-pointer"
+            >
+              {mode === 'login' ? 'Criar um usuário agora' : 'Fazer login'}
+            </button>
           </div>
         </div>
       </div>

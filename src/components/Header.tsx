@@ -51,8 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-black bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-lg animate-pulse ring-2 ring-orange-500/50"
             >
               <Sparkles className="w-4 h-4" />
-              <span className="hidden sm:inline">Planos & Preços</span>
-              <span className="sm:hidden">Planos</span>
+              <span className="inline">Planos</span>
             </button>
           )}
 
@@ -106,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold bg-yellow-400 hover:bg-yellow-300 text-purple-950 shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
               >
                 <User className="w-3.5 h-3.5" />
-                <span>Entrar / Grátis</span>
+                <span>Login</span>
               </button>
             )
           )}

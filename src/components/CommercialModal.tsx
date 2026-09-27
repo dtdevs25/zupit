@@ -61,19 +61,13 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn">
-      <div className="bg-[#200742] border-2 border-purple-700/80 rounded-3xl max-w-5xl w-full flex flex-col text-white shadow-2xl relative overflow-hidden">
+      <div className="bg-[#200742] border-2 border-purple-700/80 rounded-3xl max-w-4xl w-full flex flex-col text-white shadow-2xl relative overflow-hidden">
         {/* Header */}
         <div className="p-5 sm:p-6 border-b border-purple-800/80 flex items-center justify-between bg-[#190533]">
           <div>
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-yellow-400 block mb-1">
-              Acesso & Licenciamento Comercial
+            <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-yellow-400 block">
+              Planos & Preços
             </span>
-            <h2 className="text-xl sm:text-2xl font-black text-white">
-              Escolha seu Pacote
-            </h2>
-            <p className="text-xs text-purple-300 mt-0.5">
-              Apresente quizzes ao vivo para suas turmas, equipes ou eventos com ranking em tempo real.
-            </p>
           </div>
 
           <button
@@ -129,13 +123,13 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                 <div className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1">
                   Teste Inicial
                 </div>
-                <h3 className="text-xl font-black text-white">Gratuito</h3>
-                <p className="text-xs text-purple-300 mt-0.5">Para experimentar a plataforma</p>
+                <h3 className="text-lg font-black text-white">Plano Grátis</h3>
+                <p className="text-[11px] text-purple-300 mt-0.5">Para experimentar a plataforma</p>
 
-                <div className="mt-4 mb-5 pb-4 border-b border-purple-800/60">
+                <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black text-white tracking-tight">R$ 0</span>
-                    <span className="text-xs text-purple-400 font-medium">/ 1 quiz</span>
+                    <span className="text-2xl font-black text-white tracking-tight">R$ 0</span>
+                    <span className="text-[11px] text-purple-400 font-medium">/ 1 quiz</span>
                   </div>
                 </div>
 
@@ -192,7 +186,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300">
-                    Segundo Pacote
+                    Intermediário
                   </span>
                   {user?.planStatus === 'basic' && (
                     <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
@@ -200,13 +194,13 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                     </span>
                   )}
                 </div>
-                <h3 className="text-xl font-black text-white">Pacote Básico</h3>
-                <p className="text-xs text-purple-300 mt-0.5">Para professores e salas de aula</p>
+                <h3 className="text-lg font-black text-white">Plano Prata</h3>
+                <p className="text-[11px] text-purple-300 mt-0.5">Para professores e salas de aula</p>
 
-                <div className="mt-4 mb-5 pb-4 border-b border-purple-800/60">
+                <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black text-white tracking-tight">R$ 8,99</span>
-                    <span className="text-xs text-purple-400 font-medium">/ mês</span>
+                    <span className="text-2xl font-black text-white tracking-tight">R$ 8,99</span>
+                    <span className="text-[11px] text-purple-400 font-medium">/ mês</span>
                   </div>
                 </div>
 
@@ -249,7 +243,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                   ) : user?.planStatus === 'basic' ? (
                     'Plano Ativo'
                   ) : (
-                    'Escolher Básico'
+                    'Escolher Prata'
                   )}
                 </button>
               </div>
@@ -269,13 +263,13 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                     </span>
                   )}
                 </div>
-                <h3 className="text-xl font-black text-white">Pacote Master</h3>
-                <p className="text-xs text-purple-200 mt-0.5">Tudo liberado sem nenhuma restrição</p>
+                <h3 className="text-lg font-black text-white">Plano Ouro</h3>
+                <p className="text-[11px] text-purple-200 mt-0.5">Tudo liberado sem nenhuma restrição</p>
 
-                <div className="mt-4 mb-5 pb-4 border-b border-purple-800/60">
+                <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black text-yellow-400 tracking-tight">R$ 18,99</span>
-                    <span className="text-xs text-purple-300 font-medium">/ mês</span>
+                    <span className="text-2xl font-black text-yellow-400 tracking-tight">R$ 18,99</span>
+                    <span className="text-[11px] text-purple-300 font-medium">/ mês</span>
                   </div>
                 </div>
 
@@ -319,36 +313,14 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                       ? 'Ativando...'
                       : user?.role === 'master' || user?.planStatus === 'unlimited' || user?.planStatus === 'pro'
                       ? 'Plano Ativo'
-                      : 'Escolher Master'}
+                      : 'Escolher Ouro'}
                   </span>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Contact with Master Dani */}
-          <div className="bg-[#180530] p-4 rounded-xl border border-purple-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-purple-900/80 flex items-center justify-center text-yellow-400 shrink-0">
-                <HeartHandshake className="w-4 h-4" />
-              </div>
-              <div>
-                <h4 className="font-bold text-white text-xs">Precisa de faturamento escolar ou institucional?</h4>
-                <p className="text-[11px] text-purple-300">
-                  Fale com o Administrador Master Dani para liberação corporativa ou pagamento via Pix.
-                </p>
-              </div>
-            </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <a
-                href="mailto:Dani.dk.santos@gmail.com?subject=Solicitacao%20de%20Acesso%20Comercial%20ZUPiT"
-                className="px-3.5 py-1.5 bg-purple-900/80 hover:bg-purple-800 text-purple-200 hover:text-white rounded-lg text-xs font-bold transition-all border border-purple-700/60"
-              >
-                Falar com o Master
-              </a>
-            </div>
-          </div>
         </div>
       </div>
     </div>

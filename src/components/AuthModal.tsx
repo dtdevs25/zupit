@@ -76,7 +76,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {/* Form Area */}
-        <div className="p-6 overflow-y-auto">
+        <div className="px-6 py-4">
           {error && (
             <div className="mb-6 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-center gap-2">
               <ShieldAlert className="w-5 h-5 shrink-0" />
@@ -112,14 +112,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
 
             <div>
-              <div className="flex justify-between items-center mb-1">
-                <label className="block text-xs font-bold text-gray-700">Senha</label>
-                {mode === 'login' && (
-                  <button type="button" className="text-[11px] font-bold text-purple-600 hover:text-purple-800 transition-colors cursor-pointer">
-                    Esqueci a senha
-                  </button>
-                )}
-              </div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Senha</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -137,6 +130,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+              {mode === 'login' && (
+                <div className="text-right mt-1.5">
+                  <button type="button" className="text-[11px] font-bold text-purple-600 hover:text-purple-800 transition-colors cursor-pointer">
+                    Esqueci a senha
+                  </button>
+                </div>
+              )}
             </div>
 
             <button
@@ -150,7 +150,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </form>
 
           {/* Footer toggle */}
-          <div className="mt-5 text-center border-t border-gray-100 pt-4">
+          <div className="mt-4 text-center border-t border-gray-100 pt-3">
             <p className="text-sm text-gray-600 font-medium">
               {mode === 'login' ? 'Ainda não tem acesso?' : 'Já possui uma conta?'}
             </p>

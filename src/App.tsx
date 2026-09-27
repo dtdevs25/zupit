@@ -168,6 +168,7 @@ function AppContent() {
         onOpenMaster={() => setIsMasterModalOpen(true)}
         onOpenPlans={() => setIsPlansModalOpen(true)}
         onLogoutSuccess={() => setCurrentView('landing')}
+        onGoToHost={() => setCurrentView('quizzes')}
       />
 
       {/* Error notification toast */}

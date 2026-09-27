@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, HelpCircle, Columns, LogOut, Sparkles, Crown, User, ShieldCheck } from 'lucide-react';
+import { Volume2, VolumeX, HelpCircle, Columns, LogOut, Sparkles, Crown, User, Tv } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface HeaderProps {
@@ -13,6 +13,7 @@ interface HeaderProps {
   onOpenMaster?: () => void;
   onOpenPlans?: () => void;
   onLogoutSuccess?: () => void;
+  onGoToHost?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -26,6 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenMaster,
   onOpenPlans,
   onLogoutSuccess,
+  onGoToHost,
 }) => {
   const [showHelp, setShowHelp] = useState(false);
   const { user, isMaster, allowance, logout } = useAuth();
@@ -67,6 +69,18 @@ export const Header: React.FC<HeaderProps> = ({
               <Crown className="w-3.5 h-3.5 fill-current" />
               <span className="hidden sm:inline">Painel Master</span>
               <span className="sm:hidden">Master</span>
+            </button>
+          )}
+
+          {/* Host Panel button: visible when logged in (non-master) */}
+          {user && !isMaster && onGoToHost && (
+            <button
+              onClick={onGoToHost}
+              title="Ir para o Painel de Quizzes"
+              className="h-[36px] sm:h-[40px] px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black bg-purple-700 hover:bg-purple-600 text-white flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md shrink-0"
+            >
+              <Tv className="w-4 h-4 shrink-0" />
+              <span className="hidden sm:inline">Painel</span>
             </button>
           )}
 

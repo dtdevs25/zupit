@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PLAYER_AVATARS, PLAYER_COLORS, CharacterConfig } from '../types';
 import { CharacterAvatar, DEFAULT_CHARACTER, getRandomCharacter } from './CharacterAvatar';
 import { AvatarCustomizer } from './AvatarCustomizer';
-import { Play, Sparkles, Tv, Columns, ArrowRight, Palette, Dices } from 'lucide-react';
+import { Play, ArrowLeft, Palette, Dices } from 'lucide-react';
 
 interface HomeEntryProps {
   initialPin?: string;
@@ -52,7 +52,15 @@ export const HomeEntry: React.FC<HomeEntryProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] w-full px-4 py-8">
+    <div className="relative flex flex-col items-center justify-center min-h-[calc(100vh-65px)] w-full px-4 py-8">
+      {/* Back button — top-left floating icon */}
+      <button
+        onClick={onGoBack}
+        title="Voltar"
+        className="absolute top-4 left-4 p-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-purple-500/50 text-white transition-colors cursor-pointer shadow-md"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </button>
 
       {/* Main Join Card */}
       <div className={`w-full ${step === 'pin' ? 'max-w-3xl' : 'max-w-md'} bg-[#240b4d] border-2 border-purple-700/70 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden backdrop-blur-md transition-all duration-300`}>
@@ -200,30 +208,6 @@ export const HomeEntry: React.FC<HomeEntryProps> = ({
             </button>
           </form>
         )}
-      </div>
-
-      {/* Quick Action Cards */}
-      <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-2xl px-2">
-        <button
-          onClick={onGoBack}
-          className="w-full sm:w-auto flex-1 py-4 px-5 rounded-2xl bg-white/10 hover:bg-white/20 border-2 border-purple-500/60 text-white font-extrabold text-sm flex items-center justify-center gap-2.5 shadow-xl transition-transform active:scale-95 cursor-pointer"
-        >
-          <ArrowRight className="w-5 h-5 rotate-180" />
-          <span>Voltar ao Início</span>
-        </button>
-
-        <button
-          onClick={onGoToHost}
-          className="w-full sm:w-auto flex-1 py-4 px-5 rounded-2xl bg-[#321066] hover:bg-[#3d147d] border-2 border-purple-500/60 text-white font-extrabold text-sm flex items-center justify-center gap-2.5 shadow-xl transition-transform active:scale-95 cursor-pointer"
-        >
-          <Tv className="w-5 h-5 text-yellow-400" />
-          <span>Acessar Painel (Criar/Hospedar)</span>
-        </button>
-      </div>
-
-      {/* Footnote tips */}
-      <div className="mt-6 text-center text-xs text-purple-300/80 max-w-md px-4">
-        💡 <strong className="text-purple-200">Dica:</strong> Você pode personalizar seu avatar com óculos, bonés, penteados e roupas para se destacar no placar e no pódio!
       </div>
 
       {/* Avatar Customizer Modal */}

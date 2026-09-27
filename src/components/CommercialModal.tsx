@@ -61,7 +61,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn">
-      <div className="bg-[#200742] border-2 border-purple-700/80 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col text-white shadow-2xl relative overflow-hidden">
+      <div className="bg-[#200742] border-2 border-purple-700/80 rounded-3xl max-w-5xl w-full flex flex-col text-white shadow-2xl relative overflow-hidden">
         {/* Header */}
         <div className="p-5 sm:p-6 border-b border-purple-800/80 flex items-center justify-between bg-[#190533]">
           <div>
@@ -85,7 +85,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
         </div>
 
         {/* Content body */}
-        <div className="p-5 sm:p-6 overflow-y-auto space-y-6">
+        <div className="p-4 sm:p-5 space-y-4">
           {successMessage && (
             <div className="p-3.5 rounded-xl bg-emerald-900/80 border border-emerald-500/70 text-emerald-100 text-xs sm:text-sm flex items-center gap-3 animate-fadeIn">
               <Sparkles className="w-4 h-4 text-emerald-300 shrink-0" />

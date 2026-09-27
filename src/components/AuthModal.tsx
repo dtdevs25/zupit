@@ -65,8 +65,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 z-50 animate-fadeIn overflow-y-auto">
-      <div className="bg-[#240b4d] border-2 border-purple-700/80 rounded-3xl max-w-md w-full max-h-[92vh] flex flex-col p-5 sm:p-6 text-white shadow-2xl relative overflow-hidden my-auto">
+    <div className="fixed inset-0 bg-[#2b0d5c] flex items-center justify-center p-4 z-50 animate-fadeIn overflow-y-auto">
+      <div className="bg-[#1a0538] border border-purple-700/80 rounded-3xl max-w-lg w-full flex flex-col p-6 sm:p-10 text-white shadow-2xl relative overflow-hidden my-auto">
         {/* Glow decoration */}
         <div className="absolute -top-20 -right-20 w-44 h-44 bg-yellow-400/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-44 h-44 bg-pink-500/20 rounded-full blur-3xl pointer-events-none" />
@@ -133,39 +133,39 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <form onSubmit={handleSubmit} className="space-y-3">
             {mode === 'register' && (
               <div>
-                <label className="block text-xs font-bold text-purple-200 mb-1">Seu Nome / Apelido</label>
+                <label className="block text-sm font-bold text-purple-200 mb-2">Seu Nome / Apelido</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ex: Prof. Camila Rocha"
-                  className="w-full bg-[#160530] border border-purple-700/60 rounded-xl px-3 py-2 text-sm text-white placeholder-purple-400/50 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="w-full bg-[#160530] border-2 border-purple-700/60 rounded-2xl px-4 py-3.5 text-base text-white placeholder-purple-400/50 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-bold text-purple-200 mb-1">E-mail</label>
+              <label className="block text-sm font-bold text-purple-200 mb-2">E-mail</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seuemail@exemplo.com"
-                className="w-full bg-[#160530] border border-purple-700/60 rounded-xl px-3 py-2 text-sm text-white placeholder-purple-400/50 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                className="w-full bg-[#160530] border-2 border-purple-700/60 rounded-2xl px-4 py-3.5 text-base text-white placeholder-purple-400/50 focus:outline-none focus:ring-2 focus:ring-yellow-400"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-purple-200 mb-1">Senha</label>
+              <label className="block text-sm font-bold text-purple-200 mb-2">Senha</label>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-[#160530] border border-purple-700/60 rounded-xl px-3 py-2 text-sm text-white placeholder-purple-400/50 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                className="w-full bg-[#160530] border-2 border-purple-700/60 rounded-2xl px-4 py-3.5 text-base text-white placeholder-purple-400/50 focus:outline-none focus:ring-2 focus:ring-yellow-400"
               />
             </div>
 
@@ -184,9 +184,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-300 hover:to-amber-300 text-purple-950 font-black text-xs sm:text-sm rounded-xl shadow-lg transition-all cursor-pointer disabled:opacity-50 active:scale-98"
+              className="w-full py-4 mt-2 bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-300 hover:to-amber-300 text-purple-950 font-black text-lg rounded-2xl shadow-xl transition-all cursor-pointer disabled:opacity-50 active:scale-98"
             >
-              {loading ? 'Processando...' : mode === 'register' ? 'Criar Conta Grátis' : 'Entrar'}
+              {loading ? 'Processando...' : mode === 'register' ? 'Criar Conta Grátis' : 'Entrar na Conta'}
             </button>
           </form>
 

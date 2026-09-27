@@ -26,22 +26,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPin, onGoToHost
           Crie testes interativos, aulas dinâmicas e treinamentos divertidos em segundos com o poder da Inteligência Artificial. Seus participantes usam apenas o celular para jogar!
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full max-w-lg mx-auto animate-slideUp" style={{animationDelay: '200ms'}}>
-          <button
-            onClick={onEnterPin}
-            className="w-full py-4 px-6 bg-white hover:bg-gray-100 text-[#46178f] font-black text-lg rounded-2xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2"
-          >
-            <Play className="w-5 h-5 fill-current" />
-            Inserir PIN do Jogo
-          </button>
+        <div className="flex flex-col items-center gap-6 w-full max-w-lg mx-auto animate-slideUp" style={{animationDelay: '200ms'}}>
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
+            <button
+              onClick={onEnterPin}
+              className="w-full py-4 px-6 bg-white hover:bg-gray-100 text-[#46178f] font-black text-lg rounded-2xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2"
+            >
+              <Play className="w-5 h-5 fill-current" />
+              Inserir PIN do Jogo
+            </button>
+            
+            <button
+              onClick={onGoToHost}
+              className="w-full py-4 px-6 bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-lg rounded-2xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2"
+            >
+              Criar meu Quiz
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
           
-          <button
-            onClick={onGoToHost}
-            className="w-full py-4 px-6 bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-lg rounded-2xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2"
-          >
-            Criar meu Quiz
-            <ArrowRight className="w-5 h-5" />
-          </button>
+          <div className="text-sm text-purple-300 bg-[#321066]/50 px-6 py-3 rounded-full border border-purple-500/30 flex items-center gap-2">
+            📸 <span className="font-medium">Dica: Ou aponte a câmera do celular para o <strong>QR Code</strong> na tela!</span>
+          </div>
         </div>
       </section>
 

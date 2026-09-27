@@ -18,12 +18,18 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const TOKEN_KEY = 'quizpop_auth_token';
+const USER_KEY = 'quizpop_auth_user';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(() => {
     return localStorage.getItem(TOKEN_KEY);
   });
-  const [user, setUser] = useState<UserAccount | null>(null);
+  const [user, setUser] = useState<UserAccount | null>(() => {
+    try {
+      const cached = localStorage.getItem(USER_KEY);
+      return cached ? JSON.parse(cached) : null;
+    } catch { return null; }
+  });
   const [allowance, setAllowance] = useState<AllowanceCheckResult | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -35,16 +41,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
+        localStorage.setItem(USER_KEY, JSON.stringify(data.user));
         setAllowance(data.allowance);
-      } else {
-        // Expired or invalid
+      } else if (res.status === 401) {
+        // Token genuinely invalid/expired — clear it
         localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
         setToken(null);
         setUser(null);
         setAllowance(null);
       }
+      // On 5xx or network errors, keep existing user state
     } catch (err) {
-      console.error('Error fetching current user:', err);
+      console.error('Error fetching current user (server may be unreachable):', err);
+      // Don't wipe user on network error
     } finally {
       setIsLoading(false);
     }
@@ -69,6 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error(data.error || 'Erro ao entrar.');
     }
     localStorage.setItem(TOKEN_KEY, data.token);
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
     setToken(data.token);
     setUser(data.user);
     setAllowance(data.allowance);
@@ -85,6 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error(data.error || 'Erro ao cadastrar.');
     }
     localStorage.setItem(TOKEN_KEY, data.token);
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
     setToken(data.token);
     setUser(data.user);
     setAllowance(data.allowance);
@@ -106,6 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
     setToken(null);
     setUser(null);
     setAllowance(null);

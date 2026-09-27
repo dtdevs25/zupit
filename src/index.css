@@ -27,3 +27,21 @@
 .animate-fadeIn {
   animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.8; }
+  50% { transform: translateY(-100px) rotate(10deg); opacity: 0.5; }
+  90% { opacity: 0; }
+  100% { transform: translateY(-200px) rotate(-10deg); opacity: 0; }
+}
+.animate-float {
+  animation: float 10s ease-in-out infinite;
+}
+.animate-float-slow {
+  animation: float 15s ease-in-out infinite reverse;
+}
+.animate-float-slower {
+  animation: float 18s ease-in-out infinite;
+}
+

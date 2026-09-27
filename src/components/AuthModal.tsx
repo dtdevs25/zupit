@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Eye, EyeOff, ShieldAlert, ArrowRight } from 'lucide-react';
+import { X, Eye, EyeOff, ShieldAlert, ArrowRight, MessageCircleQuestion } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface AuthModalProps {
@@ -61,18 +61,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <X className="w-8 h-8" />
       </button>
 
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl relative overflow-hidden flex flex-col my-auto">
+      {/* Floating Background Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <MessageCircleQuestion className="absolute text-white/10 w-24 h-24 top-20 left-[10%] animate-float" />
+        <MessageCircleQuestion className="absolute text-white/5 w-16 h-16 bottom-10 left-[20%] animate-float-slow" />
+        <MessageCircleQuestion className="absolute text-white/10 w-32 h-32 top-40 right-[15%] animate-float-slower" />
+        <MessageCircleQuestion className="absolute text-white/5 w-20 h-20 bottom-20 right-[25%] animate-float" />
+      </div>
+
+      <div className="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl relative overflow-hidden flex flex-col my-auto border border-white/20 z-10">
         {/* Header / Logo Area */}
-        <div className="pt-10 pb-6 px-8 flex flex-col items-center border-b border-gray-100 bg-gray-50/50">
-          <img src="/superiortrofeu.png" alt="ZUPiT! Logo" className="h-20 object-contain mb-4 drop-shadow-md" />
-          <h2 className="text-2xl font-black text-[#321066] tracking-tight">
-            {mode === 'login' ? 'Bem-vindo de volta!' : 'Crie sua conta'}
-          </h2>
-          <p className="text-sm text-gray-500 mt-1 text-center font-medium">
-            {mode === 'login' 
-              ? 'Acesse o ZUPiT! para gerenciar seus quizzes.' 
-              : 'Comece agora a engajar sua equipe!'}
-          </p>
+        <div className="pt-12 pb-2 px-8 flex flex-col items-center">
+          <img src="/superiortrofeu.png" alt="ZUPiT! Logo" className="h-32 object-contain drop-shadow-xl" />
         </div>
 
         {/* Form Area */}

@@ -33,7 +33,7 @@ export const Header: React.FC<HeaderProps> = ({
       <header className="w-full bg-white border-b border-gray-200 px-3 sm:px-4 py-3 flex items-center justify-between shadow-md sticky top-0 z-50">
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-1.5 cursor-pointer group" onClick={() => onLeaveRoom && onLeaveRoom()}>
-            <img src="/esquerdatrofeu.png" alt="ZUPiT!" className="h-10 sm:h-12 object-contain transform group-hover:scale-105 transition-transform drop-shadow-md" />
+            <img src="/esquerdatrofeu.png" alt="ZUPiT!" className="h-14 sm:h-20 object-contain transform group-hover:scale-105 transition-transform drop-shadow-md" />
           </div>
 
           {pin && (
@@ -48,9 +48,9 @@ export const Header: React.FC<HeaderProps> = ({
           {onOpenPlans && (
             <button
               onClick={onOpenPlans}
-              className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold bg-yellow-50 hover:bg-yellow-100 text-yellow-700 border border-yellow-200 flex items-center gap-1 transition-all cursor-pointer"
+              className="px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-black bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-lg animate-pulse ring-2 ring-orange-500/50"
             >
-              <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
+              <Sparkles className="w-4 h-4" />
               <span className="hidden sm:inline">Planos & Preços</span>
               <span className="sm:hidden">Planos</span>
             </button>
@@ -126,13 +126,15 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          <button
-            onClick={onToggleSound}
-            title={soundEnabled ? 'Silenciar som' : 'Ativar som'}
-            className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-200 transition-colors"
-          >
-            {soundEnabled ? <Volume2 className="w-5 h-5 text-purple-600" /> : <VolumeX className="w-5 h-5 text-gray-400" />}
-          </button>
+          {user && (
+            <button
+              onClick={onToggleSound}
+              title={soundEnabled ? 'Silenciar som' : 'Ativar som'}
+              className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-200 transition-colors"
+            >
+              {soundEnabled ? <Volume2 className="w-5 h-5 text-purple-600" /> : <VolumeX className="w-5 h-5 text-gray-400" />}
+            </button>
+          )}
 
           <button
             onClick={() => setShowHelp(true)}

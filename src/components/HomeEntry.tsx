@@ -68,33 +68,69 @@ export const HomeEntry: React.FC<HomeEntryProps> = ({
       </div>
 
       {/* Main Join Card */}
-      <div className="w-full max-w-md bg-[#240b4d] border-2 border-purple-700/70 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden backdrop-blur-md">
+      <div className={`w-full ${step === 'pin' ? 'max-w-3xl' : 'max-w-md'} bg-[#240b4d] border-2 border-purple-700/70 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden backdrop-blur-md transition-all duration-300`}>
         {step === 'pin' ? (
-          <form onSubmit={handlePinSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-black uppercase tracking-wider text-purple-200 mb-2 text-center">
-                PIN do Jogo
-              </label>
-              <input
-                type="text"
-                required
-                value={pin}
-                onChange={(e) => setPin(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
-                placeholder="Ex: 849 203"
-                autoFocus
-                className="w-full bg-white text-[#240b4d] text-center font-mono font-black text-3xl sm:text-4xl py-4 px-4 rounded-2xl border-4 border-yellow-400/80 focus:outline-none focus:ring-4 focus:ring-yellow-400/40 tracking-widest shadow-inner placeholder:text-gray-300 placeholder:font-sans placeholder:text-2xl"
-              />
+          <div className="flex flex-col md:flex-row items-stretch gap-8">
+            {/* Left Side: PIN Input */}
+            <div className="flex-1 flex flex-col justify-center">
+              <form onSubmit={handlePinSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-wider text-purple-200 mb-2 text-center">
+                    PIN do Jogo
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+                    placeholder="Ex: 849 203"
+                    autoFocus
+                    className="w-full bg-white text-[#240b4d] text-center font-mono font-black text-3xl sm:text-4xl py-4 px-4 rounded-2xl border-4 border-yellow-400/80 focus:outline-none focus:ring-4 focus:ring-yellow-400/40 tracking-widest shadow-inner placeholder:text-gray-300 placeholder:font-sans placeholder:text-2xl"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={!pin.trim() || pin.length < 3}
+                  className="w-full py-4 bg-yellow-400 hover:bg-yellow-300 disabled:opacity-50 text-purple-950 font-black text-lg rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                >
+                  <span>Entrar na Sala</span>
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </form>
             </div>
 
-            <button
-              type="submit"
-              disabled={!pin.trim() || pin.length < 3}
-              className="w-full py-4 bg-[#321066] hover:bg-[#3c137a] disabled:opacity-50 text-white font-black text-lg rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer border-b-4 border-purple-950 active:scale-98"
-            >
-              <span>Continuar</span>
-              <ArrowRight className="w-5 h-5" />
-            </button>
-          </form>
+            {/* Divider */}
+            <div className="hidden md:flex flex-col items-center justify-center">
+              <div className="w-px h-full bg-purple-700/50"></div>
+              <div className="py-2 text-xs font-bold text-purple-300 uppercase tracking-widest bg-[#240b4d] absolute">OU</div>
+            </div>
+            
+            <div className="flex md:hidden items-center justify-center py-2">
+              <div className="h-px w-full bg-purple-700/50"></div>
+              <div className="px-2 text-xs font-bold text-purple-300 uppercase tracking-widest absolute bg-[#240b4d]">OU</div>
+            </div>
+
+            {/* Right Side: QR Code Illustration */}
+            <div className="flex-1 flex flex-col items-center justify-center bg-purple-900/40 rounded-2xl p-6 border border-purple-700/50 text-center">
+              <div className="w-32 h-32 bg-white rounded-xl mb-4 p-2 shadow-lg flex items-center justify-center border-4 border-yellow-400 border-dashed animate-pulse">
+                {/* Fake QR pattern */}
+                <div className="w-full h-full bg-gray-200 grid grid-cols-4 grid-rows-4 gap-1 p-1">
+                  <div className="bg-[#240b4d] rounded-sm col-span-2 row-span-2"></div>
+                  <div className="bg-[#240b4d] rounded-sm"></div>
+                  <div className="bg-[#240b4d] rounded-sm col-span-2 row-span-2 col-start-3"></div>
+                  <div className="bg-[#240b4d] rounded-sm"></div>
+                  <div className="bg-[#240b4d] rounded-sm row-start-3"></div>
+                  <div className="bg-[#240b4d] rounded-sm col-span-2 row-span-2 row-start-3"></div>
+                  <div className="bg-[#240b4d] rounded-sm col-start-4 row-start-4"></div>
+                </div>
+              </div>
+              <h3 className="font-black text-yellow-300 mb-1">Câmera do Celular</h3>
+              <p className="text-xs text-purple-200 leading-relaxed">
+                Aponte a câmera do seu celular para o <strong>QR Code</strong> projetado no telão para entrar instantaneamente!
+              </p>
+            </div>
+          </div>
         ) : (
           <form onSubmit={handleJoinSubmit} className="space-y-4 animate-fadeIn">
             <div className="flex items-center justify-between pb-2 border-b border-purple-800">

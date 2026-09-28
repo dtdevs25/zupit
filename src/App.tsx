@@ -306,6 +306,10 @@ function AppContent() {
               <QuizSelector
                 quizzes={quizzes}
                 onSelectQuiz={handleSelectQuizToHost}
+                onEditQuiz={(quiz) => {
+                  setEditingQuiz(quiz);
+                  setIsBuilderOpen(true);
+                }}
                 onOpenBuilder={() => {
                   setEditingQuiz(null);
                   setIsBuilderOpen(true);

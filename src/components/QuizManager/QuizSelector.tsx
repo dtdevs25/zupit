@@ -6,6 +6,7 @@ interface QuizSelectorProps {
   quizzes: Quiz[];
   onSelectQuiz: (quiz: Quiz) => void;
   onOpenBuilder: () => void;
+  onEditQuiz: (quiz: Quiz) => void;
   onOpenAIGenerator: () => void;
   onBackToHome: () => void;
 }
@@ -14,6 +15,7 @@ export const QuizSelector: React.FC<QuizSelectorProps> = ({
   quizzes,
   onSelectQuiz,
   onOpenBuilder,
+  onEditQuiz,
   onOpenAIGenerator,
   onBackToHome,
 }) => {
@@ -87,13 +89,21 @@ export const QuizSelector: React.FC<QuizSelectorProps> = ({
                 <span>{quiz.questions.length} perguntas</span>
               </div>
 
-              <button
-                onClick={() => onSelectQuiz(quiz)}
-                className="px-5 py-2.5 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer"
-              >
-                <Play className="w-4 h-4 fill-current" />
-                <span>Apresentar</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => onEditQuiz(quiz)}
+                  className="px-3 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-600 text-white font-bold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer"
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => onSelectQuiz(quiz)}
+                  className="px-5 py-2.5 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer"
+                >
+                  <Play className="w-4 h-4 fill-current" />
+                  <span>Apresentar</span>
+                </button>
+              </div>
             </div>
           </div>
         ))}

@@ -93,7 +93,7 @@ function AppContent() {
       .then(res => res.json())
       .then(data => {
         if (data.quizzes) {
-          setQuizzes([...DEFAULT_QUIZZES, ...data.quizzes]);
+          setQuizzes(data.quizzes);
         }
       })
       .catch(err => console.error('Error fetching quizzes:', err));
@@ -136,9 +136,40 @@ function AppContent() {
           },
           body: JSON.stringify({ quiz: newQuiz })
         });
+        
+        // Refresh quizzes from server to get the new list with correct IDs and ordering
+        const res = await fetch('/api/quizzes', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.quizzes) {
+          setQuizzes(data.quizzes);
+        }
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleDeleteQuiz = async (quizId: string) => {
+    // Optimistic UI update
+    setQuizzes(prev => prev.filter(q => q.id !== quizId));
+    
+    // Save locally as fallback
+    const customOnly = quizzes.filter(q => !DEFAULT_QUIZZES.some(dq => dq.id === q.id));
+    const updatedCustom = customOnly.filter(q => q.id !== quizId);
+    localStorage.setItem('quizpop_custom_quizzes', JSON.stringify(updatedCustom));
+    localStorage.setItem('quizoot_custom_quizzes', JSON.stringify(updatedCustom));
+
+    if (user && token) {
+      try {
+        await fetch(`/api/quizzes/${quizId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
@@ -339,6 +370,7 @@ function AppContent() {
                   setEditingQuiz(quiz);
                   setIsBuilderOpen(true);
                 }}
+                onDeleteQuiz={handleDeleteQuiz}
                 onOpenBuilder={() => {
                   setEditingQuiz(null);
                   setIsBuilderOpen(true);

@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import pg from 'pg';
 import { UserAccount, AllowanceCheckResult, AdminMetrics } from './src/types/auth.ts';
+import { DEFAULT_QUIZZES } from './src/data/defaultQuizzes.ts';
 
 const { Pool } = pg;
 
@@ -388,7 +389,17 @@ export async function saveQuiz(userId: string, quiz: any) {
 
 export async function getQuizzesByUser(userId: string) {
   const quizzesRes = await pool.query('SELECT * FROM quizzes WHERE user_id = $1 ORDER BY updated_at DESC', [userId]);
-  const quizzes = quizzesRes.rows;
+  let quizzes = quizzesRes.rows;
+  
+  if (quizzes.length === 0) {
+    for (const dq of DEFAULT_QUIZZES) {
+      const uniqueId = `${dq.id}_${Date.now()}_${Math.random().toString(36).substring(2,7)}`;
+      const newQuiz = { ...dq, id: uniqueId };
+      await saveQuiz(userId, newQuiz);
+    }
+    const newQuizzesRes = await pool.query('SELECT * FROM quizzes WHERE user_id = $1 ORDER BY updated_at DESC', [userId]);
+    quizzes = newQuizzesRes.rows;
+  }
   
   const result = [];
   for (const q of quizzes) {

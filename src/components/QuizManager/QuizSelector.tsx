@@ -1,12 +1,13 @@
 import React from 'react';
 import { Quiz } from '../../types';
-import { Play, Plus, Sparkles, Clock, HelpCircle, Layers } from 'lucide-react';
+import { Play, Plus, Sparkles, Clock, HelpCircle, Layers, PenLine, Trash2 } from 'lucide-react';
 
 interface QuizSelectorProps {
   quizzes: Quiz[];
   onSelectQuiz: (quiz: Quiz) => void;
   onOpenBuilder: () => void;
   onEditQuiz: (quiz: Quiz) => void;
+  onDeleteQuiz: (quizId: string) => void;
   onOpenAIGenerator: () => void;
   onBackToHome: () => void;
 }
@@ -16,6 +17,7 @@ export const QuizSelector: React.FC<QuizSelectorProps> = ({
   onSelectQuiz,
   onOpenBuilder,
   onEditQuiz,
+  onDeleteQuiz,
   onOpenAIGenerator,
   onBackToHome,
 }) => {
@@ -92,16 +94,24 @@ export const QuizSelector: React.FC<QuizSelectorProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => onEditQuiz(quiz)}
-                  className="px-3 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-600 text-white font-bold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer"
+                  className="p-2.5 rounded-xl bg-purple-700 hover:bg-purple-600 text-white shadow-md transition-all active:scale-95 cursor-pointer"
+                  title="Editar Quiz"
                 >
-                  Editar
+                  <PenLine className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => onDeleteQuiz(quiz.id)}
+                  className="p-2.5 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-500 hover:text-white shadow-md transition-all active:scale-95 cursor-pointer"
+                  title="Excluir Quiz"
+                >
+                  <Trash2 className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => onSelectQuiz(quiz)}
-                  className="px-5 py-2.5 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer"
+                  className="p-2.5 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-purple-950 shadow-md transition-all active:scale-95 cursor-pointer"
+                  title="Apresentar Quiz"
                 >
-                  <Play className="w-4 h-4 fill-current" />
-                  <span>Apresentar</span>
+                  <Play className="w-5 h-5 fill-current" />
                 </button>
               </div>
             </div>

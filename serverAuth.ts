@@ -42,9 +42,12 @@ export async function initDb() {
         description TEXT,
         category VARCHAR(100),
         cover_emoji VARCHAR(10),
+        is_public BOOLEAN DEFAULT false,
         created_at BIGINT NOT NULL,
         updated_at BIGINT NOT NULL
       );
+      
+      ALTER TABLE quizzes ADD COLUMN IF NOT EXISTS is_public BOOLEAN DEFAULT false;
       
       CREATE TABLE IF NOT EXISTS questions (
         id VARCHAR(255) PRIMARY KEY,
@@ -72,8 +75,30 @@ export async function initDb() {
         'master-1', 'Dani Master', masterEmail, 'master', 'unlimited', false, 0, 9999, 999999, 999999, Date.now(), Date.now(), 'Administrador Master', hashPassword('master123')
       ]);
     } else {
-      // Sempre atualiza a senha do master para garantir que a migração de criptografia não quebre o acesso
       await client.query('UPDATE users SET password_hash = $1 WHERE email = $2', [hashPassword('master123'), masterEmail]);
+    }
+
+    // Seed default quizzes
+    for (const dq of DEFAULT_QUIZZES) {
+      const qRes = await client.query('SELECT id FROM quizzes WHERE id = $1', [dq.id]);
+      if (qRes.rows.length === 0) {
+        await client.query(`
+          INSERT INTO quizzes (id, user_id, title, description, category, cover_emoji, is_public, created_at, updated_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        `, [dq.id, 'master-1', dq.title, dq.description, dq.category, dq.coverEmoji, true, Date.now(), Date.now()]);
+        
+        for (let i = 0; i < dq.questions.length; i++) {
+          const q = dq.questions[i];
+          await client.query(`
+            INSERT INTO questions (id, quiz_id, text, type, time_limit, points, options, correct_answer, explanation, media_url, order_index)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+          `, [
+            q.id, dq.id, q.text, q.type || 'multiple_choice', q.timeLimit || 20, 
+            q.points || 1000, JSON.stringify(q.options), q.correctAnswer, 
+            q.explanation || '', q.mediaUrl || '', i
+          ]);
+        }
+      }
     }
   } finally {
     client.release();
@@ -346,33 +371,48 @@ export async function saveQuiz(userId: string, quiz: any) {
     await client.query('BEGIN');
     
     // Check if quiz exists
-    const res = await client.query('SELECT id FROM quizzes WHERE id = $1', [quiz.id]);
+    const res = await client.query('SELECT id, user_id FROM quizzes WHERE id = $1', [quiz.id]);
     const exists = res.rows.length > 0;
     
+    // If it exists but belongs to someone else (e.g. system default), we duplicate it
+    let actualQuizId = quiz.id;
+    let isUpdate = false;
+    
     if (exists) {
+      if (res.rows[0].user_id === userId) {
+        isUpdate = true;
+      } else {
+        // Create duplicate ID for the user
+        actualQuizId = `${quiz.id}_${Date.now()}_${Math.random().toString(36).substring(2,7)}`;
+      }
+    }
+    
+    if (isUpdate) {
       await client.query(`
         UPDATE quizzes SET 
           title = $1, description = $2, category = $3, cover_emoji = $4, updated_at = $5
         WHERE id = $6 AND user_id = $7
-      `, [quiz.title, quiz.description, quiz.category, quiz.coverEmoji, Date.now(), quiz.id, userId]);
+      `, [quiz.title, quiz.description, quiz.category, quiz.coverEmoji, Date.now(), actualQuizId, userId]);
       
       // Delete old questions
-      await client.query('DELETE FROM questions WHERE quiz_id = $1', [quiz.id]);
+      await client.query('DELETE FROM questions WHERE quiz_id = $1', [actualQuizId]);
     } else {
       await client.query(`
         INSERT INTO quizzes (id, user_id, title, description, category, cover_emoji, created_at, updated_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      `, [quiz.id, userId, quiz.title, quiz.description, quiz.category, quiz.coverEmoji, Date.now(), Date.now()]);
+      `, [actualQuizId, userId, quiz.title, quiz.description, quiz.category, quiz.coverEmoji, Date.now(), Date.now()]);
     }
 
     // Insert questions
     for (let i = 0; i < quiz.questions.length; i++) {
       const q = quiz.questions[i];
+      // Generate new question IDs if we are duplicating
+      const qId = isUpdate ? q.id : `${q.id}_${Date.now()}_${i}`;
       await client.query(`
         INSERT INTO questions (id, quiz_id, text, type, time_limit, points, options, correct_answer, explanation, media_url, order_index)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       `, [
-        q.id, quiz.id, q.text, q.type || 'multiple_choice', q.timeLimit || 20, 
+        qId, actualQuizId, q.text, q.type || 'multiple_choice', q.timeLimit || 20, 
         q.points || 1000, JSON.stringify(q.options), q.correctAnswer, 
         q.explanation || '', q.mediaUrl || '', i
       ]);
@@ -388,18 +428,12 @@ export async function saveQuiz(userId: string, quiz: any) {
 }
 
 export async function getQuizzesByUser(userId: string) {
-  const quizzesRes = await pool.query('SELECT * FROM quizzes WHERE user_id = $1 ORDER BY updated_at DESC', [userId]);
+  const quizzesRes = await pool.query(`
+    SELECT * FROM quizzes 
+    WHERE user_id = $1 OR is_public = true 
+    ORDER BY updated_at DESC
+  `, [userId]);
   let quizzes = quizzesRes.rows;
-  
-  if (quizzes.length === 0) {
-    for (const dq of DEFAULT_QUIZZES) {
-      const uniqueId = `${dq.id}_${Date.now()}_${Math.random().toString(36).substring(2,7)}`;
-      const newQuiz = { ...dq, id: uniqueId };
-      await saveQuiz(userId, newQuiz);
-    }
-    const newQuizzesRes = await pool.query('SELECT * FROM quizzes WHERE user_id = $1 ORDER BY updated_at DESC', [userId]);
-    quizzes = newQuizzesRes.rows;
-  }
   
   const result = [];
   for (const q of quizzes) {
@@ -410,6 +444,8 @@ export async function getQuizzesByUser(userId: string) {
       description: q.description,
       category: q.category,
       coverEmoji: q.cover_emoji,
+      isPublic: q.is_public,
+      isOwner: q.user_id === userId,
       questions: questionsRes.rows.map(row => ({
         id: row.id,
         text: row.text,

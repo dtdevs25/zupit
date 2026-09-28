@@ -23,6 +23,8 @@ export interface Quiz {
   category: string;
   coverEmoji: string;
   themeColor?: string;
+  isPublic?: boolean;
+  isOwner?: boolean;
   questions: QuizQuestion[];
   createdAt: number;
 }

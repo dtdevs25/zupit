@@ -99,13 +99,15 @@ export const QuizSelector: React.FC<QuizSelectorProps> = ({
                 >
                   <PenLine className="w-5 h-5" />
                 </button>
-                <button
-                  onClick={() => onDeleteQuiz(quiz.id)}
-                  className="p-2.5 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-500 hover:text-white shadow-md transition-all active:scale-95 cursor-pointer"
-                  title="Excluir Quiz"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
+                {quiz.isOwner !== false && (
+                  <button
+                    onClick={() => onDeleteQuiz(quiz.id)}
+                    className="p-2.5 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-500 hover:text-white shadow-md transition-all active:scale-95 cursor-pointer"
+                    title="Excluir Quiz"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                )}
                 <button
                   onClick={() => onSelectQuiz(quiz)}
                   className="p-2.5 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-purple-950 shadow-md transition-all active:scale-95 cursor-pointer"

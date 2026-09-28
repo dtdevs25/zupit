@@ -84,6 +84,22 @@ function AppContent() {
     }
   }, []);
 
+  // Fetch quizzes from DB
+  useEffect(() => {
+    if (user && token) {
+      fetch('/api/quizzes', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.quizzes) {
+          setQuizzes([...DEFAULT_QUIZZES, ...data.quizzes]);
+        }
+      })
+      .catch(err => console.error('Error fetching quizzes:', err));
+    }
+  }, [user, token]);
+
   // Watch for server-side allowance errors on socket
   useEffect(() => {
     if (socket.allowanceError) {
@@ -93,8 +109,9 @@ function AppContent() {
   }, [socket.allowanceError, socket]);
 
   // Save new custom quiz
-  const handleSaveQuiz = (newQuiz: Quiz) => {
+  const handleSaveQuiz = async (newQuiz: Quiz) => {
     try {
+      // Save locally as fallback
       const customOnly = quizzes.filter(q => !DEFAULT_QUIZZES.some(dq => dq.id === q.id));
       const existingIdx = customOnly.findIndex(q => q.id === newQuiz.id);
       let updatedCustom: Quiz[];
@@ -108,6 +125,18 @@ function AppContent() {
       localStorage.setItem('quizpop_custom_quizzes', JSON.stringify(updatedCustom));
       localStorage.setItem('quizoot_custom_quizzes', JSON.stringify(updatedCustom));
       setQuizzes([...DEFAULT_QUIZZES, ...updatedCustom]);
+
+      // Save to database if logged in
+      if (user && token) {
+        await fetch('/api/quizzes', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ quiz: newQuiz })
+        });
+      }
     } catch (e) {
       console.error(e);
     }

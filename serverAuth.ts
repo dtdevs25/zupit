@@ -33,6 +33,31 @@ export async function initDb() {
         notes TEXT,
         password_hash VARCHAR(255) NOT NULL
       );
+      
+      CREATE TABLE IF NOT EXISTS quizzes (
+        id VARCHAR(255) PRIMARY KEY,
+        user_id VARCHAR(255) REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        category VARCHAR(100),
+        cover_emoji VARCHAR(10),
+        created_at BIGINT NOT NULL,
+        updated_at BIGINT NOT NULL
+      );
+      
+      CREATE TABLE IF NOT EXISTS questions (
+        id VARCHAR(255) PRIMARY KEY,
+        quiz_id VARCHAR(255) REFERENCES quizzes(id) ON DELETE CASCADE,
+        text TEXT NOT NULL,
+        type VARCHAR(50) DEFAULT 'multiple_choice',
+        time_limit INT DEFAULT 20,
+        points INT DEFAULT 1000,
+        options JSONB NOT NULL,
+        correct_answer INT NOT NULL,
+        explanation TEXT,
+        media_url TEXT,
+        order_index INT NOT NULL
+      );
     `);
     
     // Create or update master user
@@ -311,4 +336,85 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
   const totalRevenueSimulated = Number(((basicUsers * 8.99) + (proUsers * 18.99)).toFixed(2));
 
   return { totalUsers, freeTrialUsers, basicUsers, proUsers, totalQuizzesHosted, totalRevenueSimulated };
+}
+
+// --- Quiz CRUD ---
+export async function saveQuiz(userId: string, quiz: any) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    
+    // Check if quiz exists
+    const res = await client.query('SELECT id FROM quizzes WHERE id = $1', [quiz.id]);
+    const exists = res.rows.length > 0;
+    
+    if (exists) {
+      await client.query(`
+        UPDATE quizzes SET 
+          title = $1, description = $2, category = $3, cover_emoji = $4, updated_at = $5
+        WHERE id = $6 AND user_id = $7
+      `, [quiz.title, quiz.description, quiz.category, quiz.coverEmoji, Date.now(), quiz.id, userId]);
+      
+      // Delete old questions
+      await client.query('DELETE FROM questions WHERE quiz_id = $1', [quiz.id]);
+    } else {
+      await client.query(`
+        INSERT INTO quizzes (id, user_id, title, description, category, cover_emoji, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `, [quiz.id, userId, quiz.title, quiz.description, quiz.category, quiz.coverEmoji, Date.now(), Date.now()]);
+    }
+
+    // Insert questions
+    for (let i = 0; i < quiz.questions.length; i++) {
+      const q = quiz.questions[i];
+      await client.query(`
+        INSERT INTO questions (id, quiz_id, text, type, time_limit, points, options, correct_answer, explanation, media_url, order_index)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      `, [
+        q.id, quiz.id, q.text, q.type || 'multiple_choice', q.timeLimit || 20, 
+        q.points || 1000, JSON.stringify(q.options), q.correctAnswer, 
+        q.explanation || '', q.mediaUrl || '', i
+      ]);
+    }
+    
+    await client.query('COMMIT');
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+export async function getQuizzesByUser(userId: string) {
+  const quizzesRes = await pool.query('SELECT * FROM quizzes WHERE user_id = $1 ORDER BY updated_at DESC', [userId]);
+  const quizzes = quizzesRes.rows;
+  
+  const result = [];
+  for (const q of quizzes) {
+    const questionsRes = await pool.query('SELECT * FROM questions WHERE quiz_id = $1 ORDER BY order_index ASC', [q.id]);
+    result.push({
+      id: q.id,
+      title: q.title,
+      description: q.description,
+      category: q.category,
+      coverEmoji: q.cover_emoji,
+      questions: questionsRes.rows.map(row => ({
+        id: row.id,
+        text: row.text,
+        type: row.type,
+        timeLimit: row.time_limit,
+        points: row.points,
+        options: row.options,
+        correctAnswer: row.correct_answer,
+        explanation: row.explanation,
+        mediaUrl: row.media_url,
+      }))
+    });
+  }
+  return result;
+}
+
+export async function deleteQuiz(userId: string, quizId: string) {
+  await pool.query('DELETE FROM quizzes WHERE id = $1 AND user_id = $2', [quizId, userId]);
 }

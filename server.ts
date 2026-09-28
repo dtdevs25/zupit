@@ -18,6 +18,9 @@ import {
   deleteUserByAdmin,
   getAllUsersAdmin,
   getAdminMetrics,
+  saveQuiz,
+  getQuizzesByUser,
+  deleteQuiz,
 } from './serverAuth.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -1196,6 +1199,56 @@ RETORNE APENAS O JSON VÁLIDO. Nenhuma outra formatação (SEM CRASES de markdow
   } catch (err: any) {
     console.error('Error generating AI quiz:', err);
     res.status(500).json({ error: 'Falha ao gerar quiz.' });
+  }
+});
+
+// ==========================================
+// Quiz CRUD Routes
+// ==========================================
+
+app.get('/api/quizzes', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Nao autenticado' });
+  const token = authHeader.replace(/^Bearer\s+/, '');
+  const user = await getUserByToken(token);
+  if (!user) return res.status(401).json({ error: 'Usuario invalido' });
+  
+  try {
+    const quizzes = await getQuizzesByUser(user.id);
+    res.json({ quizzes });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/quizzes', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Nao autenticado' });
+  const token = authHeader.replace(/^Bearer\s+/, '');
+  const user = await getUserByToken(token);
+  if (!user) return res.status(401).json({ error: 'Usuario invalido' });
+  
+  try {
+    const { quiz } = req.body;
+    await saveQuiz(user.id, quiz);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/quizzes/:id', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Nao autenticado' });
+  const token = authHeader.replace(/^Bearer\s+/, '');
+  const user = await getUserByToken(token);
+  if (!user) return res.status(401).json({ error: 'Usuario invalido' });
+  
+  try {
+    await deleteQuiz(user.id, req.params.id);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
   }
 });
 

@@ -78,27 +78,27 @@ export async function initDb() {
       await client.query('UPDATE users SET password_hash = $1 WHERE email = $2', [hashPassword('master123'), masterEmail]);
     }
 
+    // Wipe old public quizzes to fix any bugged empty ones, then re-seed
+    await client.query('DELETE FROM quizzes WHERE is_public = true');
+
     // Seed default quizzes
     for (const dq of DEFAULT_QUIZZES) {
-      const qRes = await client.query('SELECT id FROM quizzes WHERE id = $1', [dq.id]);
-      if (qRes.rows.length === 0) {
+      await client.query(`
+        INSERT INTO quizzes (id, user_id, title, description, category, cover_emoji, is_public, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `, [dq.id, 'master-1', dq.title, dq.description, dq.category, dq.coverEmoji, true, Date.now(), Date.now()]);
+      
+      for (let i = 0; i < dq.questions.length; i++) {
+        const q = dq.questions[i];
         await client.query(`
-          INSERT INTO quizzes (id, user_id, title, description, category, cover_emoji, is_public, created_at, updated_at)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        `, [dq.id, 'master-1', dq.title, dq.description, dq.category, dq.coverEmoji, true, Date.now(), Date.now()]);
-        
-        for (let i = 0; i < dq.questions.length; i++) {
-          const q = dq.questions[i];
-          await client.query(`
-            INSERT INTO questions (id, quiz_id, text, type, time_limit, points, options, correct_answer, explanation, media_url, order_index)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-            ON CONFLICT (id) DO NOTHING
-          `, [
-            `${dq.id}_q${i}`, dq.id, q.text, q.type || 'multiple_choice', q.timeLimit || 20, 
-            q.points || 1000, JSON.stringify(q.options), q.correctAnswer, 
-            q.explanation || '', q.mediaUrl || '', i
-          ]);
-        }
+          INSERT INTO questions (id, quiz_id, text, type, time_limit, points, options, correct_answer, explanation, media_url, order_index)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+          ON CONFLICT (id) DO NOTHING
+        `, [
+          `${dq.id}_q${i}`, dq.id, q.text, q.type || 'multiple_choice', q.timeLimit || 20, 
+          q.points || 1000, JSON.stringify(q.options), q.correctAnswer, 
+          q.explanation || '', q.mediaUrl || '', i
+        ]);
       }
     }
   } finally {
@@ -367,6 +367,10 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
 
 // --- Quiz CRUD ---
 export async function saveQuiz(userId: string, quiz: any) {
+  if (!quiz.questions || quiz.questions.length < 5) {
+    throw new Error('Um quiz precisa ter pelo menos 5 perguntas.');
+  }
+
   const client = await pool.connect();
   try {
     await client.query('BEGIN');

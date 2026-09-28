@@ -358,21 +358,32 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
         </form>
 
         {/* Modal Footer */}
-        <div className="p-4 sm:p-5 border-t border-purple-800/80 bg-[#1e0840] flex items-center justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2.5 rounded-xl text-xs font-bold text-purple-300 hover:text-white transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-6 py-2.5 bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black rounded-xl text-sm flex items-center gap-2 shadow-lg transition-transform active:scale-95 cursor-pointer"
-          >
-            <Save className="w-4 h-4" />
-            <span>Salvar Quiz</span>
-          </button>
+        <div className="p-4 sm:p-5 border-t border-purple-800/80 bg-[#1e0840] flex items-center justify-between">
+          <div className="text-xs font-medium">
+            {questions.length < 5 ? (
+              <span className="text-red-400">⚠️ Adicione pelo menos 5 perguntas para salvar. ({questions.length}/5)</span>
+            ) : (
+              <span className="text-green-400">✔️ Mínimo de perguntas atingido ({questions.length})</span>
+            )}
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2.5 rounded-xl text-xs font-bold text-purple-300 hover:text-white transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={questions.length < 5}
+              className="px-6 py-2.5 bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black rounded-xl text-sm flex items-center gap-2 shadow-lg transition-transform active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Save className="w-4 h-4" />
+              <span>Salvar Quiz</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

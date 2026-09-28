@@ -38,6 +38,7 @@ import { CommercialModal } from './components/CommercialModal';
 import { MasterAdminModal } from './components/MasterAdminModal';
 import { PaywallNoticeModal } from './components/PaywallNoticeModal';
 import { WhatsAppWidget } from './components/WhatsAppWidget';
+import { ConfirmModal } from './components/ConfirmModal';
 
 function AppContent() {
   const socket = useQuizSocket();
@@ -72,6 +73,7 @@ function AppContent() {
   const [isPlansModalOpen, setIsPlansModalOpen] = useState(false);
   const [isPaywallNoticeOpen, setIsPaywallNoticeOpen] = useState(false);
   const [pendingQuizToHost, setPendingQuizToHost] = useState<Quiz | null>(null);
+  const [quizToDelete, setQuizToDelete] = useState<string | null>(null);
 
   // Check URL parameters for direct PIN join
   useEffect(() => {
@@ -152,7 +154,7 @@ function AppContent() {
   };
 
   const handleDeleteQuiz = async (quizId: string) => {
-    // Optimistic UI update
+    // Delete from state immediately for optimistic UI
     setQuizzes(prev => prev.filter(q => q.id !== quizId));
     
     // Save locally as fallback
@@ -204,8 +206,8 @@ function AppContent() {
   };
 
   // When AI generates a quiz, add it and open prompt to host
-  const handleQuizGenerated = (newQuiz: Quiz) => {
-    handleSaveQuiz(newQuiz);
+  const handleQuizGenerated = async (newQuiz: Quiz) => {
+    await handleSaveQuiz(newQuiz);
     handleSelectQuizToHost(newQuiz);
   };
 
@@ -370,7 +372,7 @@ function AppContent() {
                   setEditingQuiz(quiz);
                   setIsBuilderOpen(true);
                 }}
-                onDeleteQuiz={handleDeleteQuiz}
+                onDeleteQuiz={(quizId) => setQuizToDelete(quizId)}
                 onOpenBuilder={() => {
                   setEditingQuiz(null);
                   setIsBuilderOpen(true);
@@ -454,6 +456,18 @@ function AppContent() {
 
       {/* Global WhatsApp Widget */}
       <WhatsAppWidget />
+      <ConfirmModal
+        isOpen={quizToDelete !== null}
+        title="Excluir Quiz?"
+        message="Esta aǜo nǜo poderǭ ser desfeita. Tem certeza que deseja apagar este quiz?"
+        onCancel={() => setQuizToDelete(null)}
+        onConfirm={() => {
+          if (quizToDelete) {
+            handleDeleteQuiz(quizToDelete);
+            setQuizToDelete(null);
+          }
+        }}
+      />
     </div>
   );
 }

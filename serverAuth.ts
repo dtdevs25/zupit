@@ -92,8 +92,9 @@ export async function initDb() {
           await client.query(`
             INSERT INTO questions (id, quiz_id, text, type, time_limit, points, options, correct_answer, explanation, media_url, order_index)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            ON CONFLICT (id) DO NOTHING
           `, [
-            q.id, dq.id, q.text, q.type || 'multiple_choice', q.timeLimit || 20, 
+            `${dq.id}_q${i}`, dq.id, q.text, q.type || 'multiple_choice', q.timeLimit || 20, 
             q.points || 1000, JSON.stringify(q.options), q.correctAnswer, 
             q.explanation || '', q.mediaUrl || '', i
           ]);
@@ -406,8 +407,8 @@ export async function saveQuiz(userId: string, quiz: any) {
     // Insert questions
     for (let i = 0; i < quiz.questions.length; i++) {
       const q = quiz.questions[i];
-      // Generate new question IDs if we are duplicating
-      const qId = isUpdate ? q.id : `${q.id}_${Date.now()}_${i}`;
+      // Generate new question IDs to avoid collisions
+      const qId = `${actualQuizId}_q${i}`;
       await client.query(`
         INSERT INTO questions (id, quiz_id, text, type, time_limit, points, options, correct_answer, explanation, media_url, order_index)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)

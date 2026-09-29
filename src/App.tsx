@@ -82,6 +82,7 @@ function AppContent() {
       const pinParam = params.get('pin');
       if (pinParam) {
         setUrlPin(pinParam);
+        setCurrentView('home');
       }
     }
   }, []);

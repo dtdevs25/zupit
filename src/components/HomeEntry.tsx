@@ -31,6 +31,7 @@ export const HomeEntry: React.FC<HomeEntryProps> = ({
   useEffect(() => {
     if (initialPin) {
       setPin(initialPin);
+      setStep('profile');
     }
   }, [initialPin]);
 

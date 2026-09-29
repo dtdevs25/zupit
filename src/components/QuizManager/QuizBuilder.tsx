@@ -39,6 +39,32 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
     ]
   );
 
+  React.useEffect(() => {
+    if (isOpen) {
+      setTitle(initialQuiz?.title || '');
+      setDescription(initialQuiz?.description || '');
+      setCategory(initialQuiz?.category || 'Geral');
+      setCoverEmoji(initialQuiz?.coverEmoji || '🎯');
+      setQuestions(initialQuiz?.questions || [
+        {
+          id: 'q_' + Date.now(),
+          text: '',
+          timeLimit: 20,
+          points: 1000,
+          type: 'multiple',
+          options: [
+            { text: '' },
+            { text: '' },
+            { text: '' },
+            { text: '' },
+          ],
+          correctAnswer: 0,
+          explanation: '',
+        },
+      ]);
+    }
+  }, [isOpen, initialQuiz]);
+
   if (!isOpen) return null;
 
   const addQuestion = () => {

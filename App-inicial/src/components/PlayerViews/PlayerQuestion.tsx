@@ -68,13 +68,6 @@ export const PlayerQuestion: React.FC<PlayerQuestionProps> = ({
         </div>
       </div>
 
-      {/* Mostrar a pergunta para o jogador */}
-      {currentQ && (
-        <div className="w-full bg-white text-[#321066] rounded-xl p-3 sm:p-4 shadow-md mb-3 flex items-center justify-center text-center">
-          <h2 className="text-sm sm:text-lg font-black">{currentQ.text}</h2>
-        </div>
-      )}
-
       {/* 4 Giant Tactile Kahoot Shape Buttons */}
       <div className={`w-full flex-1 grid gap-3 sm:gap-4 ${
         optionsCount === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-2'
@@ -87,11 +80,11 @@ export const PlayerQuestion: React.FC<PlayerQuestionProps> = ({
               onClick={() => handleSelect(idx)}
               className={`${colorMeta.bg} ${colorMeta.hover} active:scale-95 text-white rounded-3xl shadow-2xl flex flex-col items-center justify-center p-4 transition-transform cursor-pointer border-b-6 ${colorMeta.border} select-none group`}
             >
-              <span className="text-4xl sm:text-6xl font-black group-hover:scale-110 transition-transform filter drop-shadow-md">
+              <span className="text-5xl sm:text-7xl font-black group-hover:scale-110 transition-transform filter drop-shadow-md">
                 {colorMeta.icon}
               </span>
-              <span className="text-xs sm:text-sm font-extrabold tracking-widest mt-2 opacity-90 text-center px-1">
-                {currentQ?.options[idx]?.text || colorMeta.name}
+              <span className="text-xs sm:text-sm font-extrabold uppercase tracking-widest mt-2 opacity-80">
+                {colorMeta.name}
               </span>
             </button>
           );

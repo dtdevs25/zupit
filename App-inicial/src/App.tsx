@@ -9,7 +9,6 @@ import { DEFAULT_QUIZZES } from './data/defaultQuizzes';
 import { Quiz } from './types';
 import { Header } from './components/Header';
 import { HomeEntry } from './components/HomeEntry';
-import { LandingPage } from './components/LandingPage';
 import { QuizSelector } from './components/QuizManager/QuizSelector';
 import { QuizBuilder } from './components/QuizManager/QuizBuilder';
 import { AIGeneratorModal } from './components/QuizManager/AIGeneratorModal';
@@ -37,8 +36,6 @@ import { AuthModal } from './components/AuthModal';
 import { CommercialModal } from './components/CommercialModal';
 import { MasterAdminModal } from './components/MasterAdminModal';
 import { PaywallNoticeModal } from './components/PaywallNoticeModal';
-import { WhatsAppWidget } from './components/WhatsAppWidget';
-import { ConfirmModal } from './components/ConfirmModal';
 
 function AppContent() {
   const socket = useQuizSocket();
@@ -59,7 +56,7 @@ function AppContent() {
   });
 
   // Navigation
-  const [currentView, setCurrentView] = useState<'landing' | 'home' | 'quizzes' | 'split'>('landing');
+  const [currentView, setCurrentView] = useState<'home' | 'quizzes' | 'split'>('home');
   const [urlPin, setUrlPin] = useState<string>('');
 
   // Modals
@@ -73,7 +70,6 @@ function AppContent() {
   const [isPlansModalOpen, setIsPlansModalOpen] = useState(false);
   const [isPaywallNoticeOpen, setIsPaywallNoticeOpen] = useState(false);
   const [pendingQuizToHost, setPendingQuizToHost] = useState<Quiz | null>(null);
-  const [quizToDelete, setQuizToDelete] = useState<string | null>(null);
 
   // Check URL parameters for direct PIN join
   useEffect(() => {
@@ -82,26 +78,9 @@ function AppContent() {
       const pinParam = params.get('pin');
       if (pinParam) {
         setUrlPin(pinParam);
-        setCurrentView('home');
       }
     }
   }, []);
-
-  // Fetch quizzes from DB
-  useEffect(() => {
-    if (user && token) {
-      fetch('/api/quizzes', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.quizzes) {
-          setQuizzes(data.quizzes);
-        }
-      })
-      .catch(err => console.error('Error fetching quizzes:', err));
-    }
-  }, [user, token]);
 
   // Watch for server-side allowance errors on socket
   useEffect(() => {
@@ -112,9 +91,8 @@ function AppContent() {
   }, [socket.allowanceError, socket]);
 
   // Save new custom quiz
-  const handleSaveQuiz = async (newQuiz: Quiz) => {
+  const handleSaveQuiz = (newQuiz: Quiz) => {
     try {
-      // Save locally as fallback
       const customOnly = quizzes.filter(q => !DEFAULT_QUIZZES.some(dq => dq.id === q.id));
       const existingIdx = customOnly.findIndex(q => q.id === newQuiz.id);
       let updatedCustom: Quiz[];
@@ -128,70 +106,25 @@ function AppContent() {
       localStorage.setItem('quizpop_custom_quizzes', JSON.stringify(updatedCustom));
       localStorage.setItem('quizoot_custom_quizzes', JSON.stringify(updatedCustom));
       setQuizzes([...DEFAULT_QUIZZES, ...updatedCustom]);
-
-      // Save to database if logged in
-      if (user && token) {
-        await fetch('/api/quizzes', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ quiz: newQuiz })
-        });
-        
-        // Refresh quizzes from server to get the new list with correct IDs and ordering
-        const res = await fetch('/api/quizzes', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        if (data.quizzes) {
-          setQuizzes(data.quizzes);
-        }
-      }
     } catch (e) {
       console.error(e);
     }
   };
 
-  const handleDeleteQuiz = async (quizId: string) => {
-    // Delete from state immediately for optimistic UI
-    setQuizzes(prev => prev.filter(q => q.id !== quizId));
-    
-    // Save locally as fallback
-    const customOnly = quizzes.filter(q => !DEFAULT_QUIZZES.some(dq => dq.id === q.id));
-    const updatedCustom = customOnly.filter(q => q.id !== quizId);
-    localStorage.setItem('quizpop_custom_quizzes', JSON.stringify(updatedCustom));
-    localStorage.setItem('quizoot_custom_quizzes', JSON.stringify(updatedCustom));
-
-    if (user && token) {
-      try {
-        await fetch(`/api/quizzes/${quizId}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
-
   // Launch a game as Host (with commercial gate check)
   const handleSelectQuizToHost = (quiz: Quiz) => {
-    // If no user AND no token at all — must log in first
-    if (!user && !token) {
+    if (!user) {
+      // Must sign up to get 1 free trial or manage account
       setPendingQuizToHost(quiz);
       setIsAuthModalOpen(true);
       return;
     }
 
-    // If user context is loaded and allowance is denied (and not master) — show paywall
-    if (user && allowance && !allowance.allowed && !isMaster) {
+    if (allowance && !allowance.allowed && !isMaster) {
       setIsPaywallNoticeOpen(true);
       return;
     }
 
-    // Proceed — server validates token and allowance
     socket.createRoom(quiz, token || undefined);
     refreshAuth();
   };
@@ -207,8 +140,8 @@ function AppContent() {
   };
 
   // When AI generates a quiz, add it and open prompt to host
-  const handleQuizGenerated = async (newQuiz: Quiz) => {
-    await handleSaveQuiz(newQuiz);
+  const handleQuizGenerated = (newQuiz: Quiz) => {
+    handleSaveQuiz(newQuiz);
     handleSelectQuizToHost(newQuiz);
   };
 
@@ -217,26 +150,22 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-[#46178f] text-white flex flex-col font-['Montserrat',sans-serif]">
-      {/* Global Header (Hidden during game) */}
-      {!activeRoom && (
-        <Header
-          pin={socket.pin}
-          soundEnabled={socket.soundEnabled}
-          onToggleSound={socket.toggleSound}
-          onLeaveRoom={undefined}
-          onToggleSplitScreen={
-            !activeRoom && isMaster
-              ? () => setCurrentView(currentView === 'split' ? 'landing' : 'split')
-              : undefined
-          }
-          isSplitScreen={currentView === 'split'}
-          onOpenAuth={() => setIsAuthModalOpen(true)}
-          onOpenMaster={() => setIsMasterModalOpen(true)}
-          onOpenPlans={() => setIsPlansModalOpen(true)}
-          onLogoutSuccess={() => setCurrentView('landing')}
-          onGoToHost={() => setCurrentView('quizzes')}
-        />
-      )}
+      {/* Global Header */}
+      <Header
+        pin={socket.pin}
+        soundEnabled={socket.soundEnabled}
+        onToggleSound={socket.toggleSound}
+        onLeaveRoom={activeRoom ? socket.leaveRoom : undefined}
+        onToggleSplitScreen={
+          !activeRoom
+            ? () => setCurrentView(currentView === 'split' ? 'home' : 'split')
+            : undefined
+        }
+        isSplitScreen={currentView === 'split'}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenMaster={() => setIsMasterModalOpen(true)}
+        onOpenPlans={() => setIsPlansModalOpen(true)}
+      />
 
       {/* Error notification toast */}
       {socket.errorMessage && (
@@ -371,29 +300,12 @@ function AppContent() {
               <QuizSelector
                 quizzes={quizzes}
                 onSelectQuiz={handleSelectQuizToHost}
-                onEditQuiz={(quiz) => {
-                  setEditingQuiz(quiz);
-                  setIsBuilderOpen(true);
-                }}
-                onDeleteQuiz={(quizId) => setQuizToDelete(quizId)}
                 onOpenBuilder={() => {
                   setEditingQuiz(null);
                   setIsBuilderOpen(true);
                 }}
                 onOpenAIGenerator={() => setIsAIGeneratorOpen(true)}
                 onBackToHome={() => setCurrentView('home')}
-              />
-            ) : currentView === 'landing' ? (
-              <LandingPage
-                onEnterPin={() => setCurrentView('home')}
-                onGoToHost={() => {
-                  if (!user) {
-                    setIsAuthModalOpen(true);
-                  } else {
-                    setCurrentView('quizzes');
-                  }
-                }}
-                onOpenPlans={() => setIsPlansModalOpen(true)}
               />
             ) : (
               <HomeEntry
@@ -402,7 +314,9 @@ function AppContent() {
                   socket.joinRoom(pin, nickname, avatar, color, avatarConfig);
                 }}
                 onGoToHost={() => setCurrentView('quizzes')}
-                onGoBack={() => setCurrentView('landing')}
+                onToggleSplitScreen={() => setCurrentView('split')}
+                onOpenPlans={() => setIsPlansModalOpen(true)}
+                onOpenAuth={() => setIsAuthModalOpen(true)}
               />
             )}
           </>
@@ -454,21 +368,6 @@ function AppContent() {
         onOpenAuth={() => {
           setIsPaywallNoticeOpen(false);
           setIsAuthModalOpen(true);
-        }}
-      />
-
-      {/* Global WhatsApp Widget (Hidden during game) */}
-      {!activeRoom && <WhatsAppWidget />}
-      <ConfirmModal
-        isOpen={quizToDelete !== null}
-        title="Excluir Quiz?"
-        message="Esta aǜo nǜo poderǭ ser desfeita. Tem certeza que deseja apagar este quiz?"
-        onCancel={() => setQuizToDelete(null)}
-        onConfirm={() => {
-          if (quizToDelete) {
-            handleDeleteQuiz(quizToDelete);
-            setQuizToDelete(null);
-          }
         }}
       />
     </div>

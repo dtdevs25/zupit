@@ -1,10 +1,9 @@
-import dotenv from 'dotenv';
-dotenv.config();
 import express from 'express';
 import http from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 import { DEFAULT_QUIZZES } from './src/data/defaultQuizzes.ts';
 import { Quiz, Player, GameState, RoomState, QuizQuestion, CharacterConfig } from './src/types.ts';
@@ -18,10 +17,9 @@ import {
   deleteUserByAdmin,
   getAllUsersAdmin,
   getAdminMetrics,
-  saveQuiz,
-  getQuizzesByUser,
-  deleteQuiz,
 } from './serverAuth.ts';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -189,13 +187,6 @@ function getPublicRoomState(room: ServerRoom, forPlayerId?: string): RoomState {
   playersList.forEach((p, idx) => {
     const newRank = idx + 1;
     p.rank = newRank;
-    
-    // Also save rank to the actual player object so finishCurrentQuestion can read it as prevRank later
-    const actualPlayer = room.players.get(p.id);
-    if (actualPlayer) {
-      actualPlayer.player.rank = newRank;
-    }
-
     if (p.prevRank !== undefined) {
       p.rankDiff = p.prevRank - newRank;
     } else {
@@ -265,24 +256,21 @@ function getPublicRoomState(room: ServerRoom, forPlayerId?: string): RoomState {
 }
 
 function broadcastRoomUpdate(room: ServerRoom) {
-  const publicRoom = getPublicRoomState(room);
-
   // We can broadcast to host
   if (room.hostWs && room.hostWs.readyState === WebSocket.OPEN) {
     room.hostWs.send(JSON.stringify({
       type: 'ROOM_UPDATE',
-      room: publicRoom,
+      room: getPublicRoomState(room),
     }));
   }
 
   // To each player
   for (const [pId, p] of room.players.entries()) {
     if (p.ws && p.ws.readyState === WebSocket.OPEN) {
-      const myMappedPlayer = publicRoom.players.find(x => x.id === pId) || p.player;
       p.ws.send(JSON.stringify({
         type: 'ROOM_UPDATE',
-        room: publicRoom,
-        myPlayer: myMappedPlayer,
+        room: getPublicRoomState(room, pId),
+        myPlayer: p.player,
       }));
     }
   }
@@ -445,7 +433,7 @@ wss.on('connection', (ws) => {
   let boundPlayerId: string | null = null;
   let isHost = false;
 
-  ws.on('message', async (data) => {
+  ws.on('message', (data) => {
     try {
       const msg = JSON.parse(data.toString());
 
@@ -456,7 +444,7 @@ wss.on('connection', (ws) => {
           let planName = 'Teste Gratuito (Até 15 Participantes)';
 
           if (msg.token) {
-            const user = await getUserByToken(msg.token);
+            const user = getUserByToken(msg.token);
             if (user) {
               const allowance = checkAllowance(user);
               if (!allowance.allowed) {
@@ -687,7 +675,7 @@ wss.on('connection', (ws) => {
 
           // Deduct 1 hosted quiz allowance if associated with user
           if (room.hostUserId) {
-            await consumeAllowance(room.hostUserId);
+            consumeAllowance(room.hostUserId);
           }
 
           room.state = 'COUNTDOWN';
@@ -827,7 +815,10 @@ wss.on('connection', (ws) => {
 
 // REST API Endpoints
 
-
+// Get pre-made quizzes
+app.get('/api/quizzes', (req, res) => {
+  res.json({ quizzes: DEFAULT_QUIZZES });
+});
 
 // AI Quiz Generator using Google Gemini API
 app.post('/api/generate-quiz', async (req, res) => {
@@ -966,13 +957,13 @@ Responda EXCLUSIVAMENTE em formato JSON válido com a seguinte estrutura:
 // Authentication & Commercial Control Routes
 // ==========================================
 
-app.post('/api/auth/register', async (req, res) => {
+app.post('/api/auth/register', (req, res) => {
   try {
     const { name, email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: 'E-mail e senha são obrigatórios.' });
     }
-    const result = await registerUser(name || 'Usuário', email, password);
+    const result = registerUser(name || 'Usuário', email, password);
     const allowance = checkAllowance(result.user);
     res.json({ ...result, allowance });
   } catch (err: any) {
@@ -980,13 +971,13 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email) {
       return res.status(400).json({ error: 'E-mail é obrigatório.' });
     }
-    const result = await loginUser(email, password);
+    const result = loginUser(email, password);
     const allowance = checkAllowance(result.user);
     res.json({ ...result, allowance });
   } catch (err: any) {
@@ -994,19 +985,19 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-app.get('/api/auth/me', async (req, res) => {
+app.get('/api/auth/me', (req, res) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: 'Não autenticado' });
   const token = authHeader.replace(/^Bearer\s+/, '');
-  const user = await getUserByToken(token);
+  const user = getUserByToken(token);
   if (!user) return res.status(401).json({ error: 'Sessão expirada' });
   const allowance = checkAllowance(user);
   res.json({ user, allowance });
 });
 
-app.post('/api/auth/quick-master', async (_req, res) => {
+app.post('/api/auth/quick-master', (_req, res) => {
   try {
-    const result = await loginUser('Dani.dk.santos@gmail.com', 'master123', true);
+    const result = loginUser('Dani.dk.santos@gmail.com', 'master123', true);
     const allowance = checkAllowance(result.user);
     res.json({ ...result, allowance });
   } catch (err: any) {
@@ -1014,19 +1005,19 @@ app.post('/api/auth/quick-master', async (_req, res) => {
   }
 });
 
-app.post('/api/auth/allowance/check', async (req, res) => {
+app.post('/api/auth/allowance/check', (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
-  const user = token ? await getUserByToken(token) : null;
+  const user = token ? getUserByToken(token) : null;
   const allowance = checkAllowance(user);
   res.json(allowance);
 });
 
-app.post('/api/auth/simulate-upgrade', async (req, res) => {
+app.post('/api/auth/simulate-upgrade', (req, res) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: 'Não autenticado' });
   const token = authHeader.replace(/^Bearer\s+/, '');
-  const user = await getUserByToken(token);
+  const user = getUserByToken(token);
   if (!user) return res.status(401).json({ error: 'Usuário inválido' });
 
   const { planType, addCredits } = req.body;
@@ -1048,7 +1039,7 @@ app.post('/api/auth/simulate-upgrade', async (req, res) => {
     updates.notes = `Pacote +${addCredits} Quizzes ativado`;
   }
 
-  const updated = await updateUserByAdmin(user.id, updates);
+  const updated = updateUserByAdmin(user.id, updates);
   res.json({ user: updated, allowance: checkAllowance(updated) });
 });
 
@@ -1056,129 +1047,77 @@ app.post('/api/auth/simulate-upgrade', async (req, res) => {
 // Master Admin Backoffice Routes
 // ==========================================
 
-app.get('/api/admin/users', async (req, res) => {
+app.get('/api/admin/users', (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
-  const user = token ? await getUserByToken(token) : null;
+  const user = token ? getUserByToken(token) : null;
   if (!user || user.role !== 'master') {
     return res.status(403).json({ error: 'Acesso restrito ao Usuário Master.' });
   }
-  res.json({ users: await getAllUsersAdmin(), metrics: await getAdminMetrics() });
+  res.json({ users: getAllUsersAdmin(), metrics: getAdminMetrics() });
 });
 
-app.post('/api/admin/users', async (req, res) => {
+app.post('/api/admin/users', (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
-  const user = token ? await getUserByToken(token) : null;
+  const user = token ? getUserByToken(token) : null;
   if (!user || user.role !== 'master') {
     return res.status(403).json({ error: 'Acesso restrito ao Usuário Master.' });
   }
   try {
     const { name, email, password, planStatus, paidCredits, notes } = req.body;
-    const created = await registerUser(name, email, password || 'senha123');
+    const created = registerUser(name, email, password || 'senha123');
     if (planStatus || paidCredits !== undefined || notes) {
-      await updateUserByAdmin(created.user.id, {
+      updateUserByAdmin(created.user.id, {
         planStatus: planStatus || 'free_trial',
         paidCredits: paidCredits || 0,
         notes,
       });
     }
-    res.json({ success: true, users: await getAllUsersAdmin(), metrics: await getAdminMetrics() });
+    res.json({ success: true, users: getAllUsersAdmin(), metrics: getAdminMetrics() });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
 });
 
-app.patch('/api/admin/users/:id', async (req, res) => {
+app.patch('/api/admin/users/:id', (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
-  const user = token ? await getUserByToken(token) : null;
+  const user = token ? getUserByToken(token) : null;
   if (!user || user.role !== 'master') {
     return res.status(403).json({ error: 'Acesso restrito ao Usuário Master.' });
   }
   try {
-    const updated = await updateUserByAdmin(req.params.id, req.body);
-    res.json({ user: updated, metrics: await getAdminMetrics() });
+    const updated = updateUserByAdmin(req.params.id, req.body);
+    res.json({ user: updated, metrics: getAdminMetrics() });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
 });
 
-app.delete('/api/admin/users/:id', async (req, res) => {
+app.delete('/api/admin/users/:id', (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
-  const user = token ? await getUserByToken(token) : null;
+  const user = token ? getUserByToken(token) : null;
   if (!user || user.role !== 'master') {
     return res.status(403).json({ error: 'Acesso restrito ao Usuário Master.' });
   }
   try {
-    await deleteUserByAdmin(req.params.id);
-    res.json({ success: true, metrics: await getAdminMetrics() });
+    deleteUserByAdmin(req.params.id);
+    res.json({ success: true, metrics: getAdminMetrics() });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
 });
 
-app.get('/api/admin/metrics', async (req, res) => {
+app.get('/api/admin/metrics', (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
-  const user = token ? await getUserByToken(token) : null;
+  const user = token ? getUserByToken(token) : null;
   if (!user || user.role !== 'master') {
     return res.status(403).json({ error: 'Acesso restrito ao Usuário Master.' });
   }
-  res.json(await getAdminMetrics());
-});
-
-
-
-// ==========================================
-// Quiz CRUD Routes
-// ==========================================
-
-app.get('/api/quizzes', async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: 'Nao autenticado' });
-  const token = authHeader.replace(/^Bearer\s+/, '');
-  const user = await getUserByToken(token);
-  if (!user) return res.status(401).json({ error: 'Usuario invalido' });
-  
-  try {
-    const quizzes = await getQuizzesByUser(user.id);
-    res.json({ quizzes });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post('/api/quizzes', async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: 'Nao autenticado' });
-  const token = authHeader.replace(/^Bearer\s+/, '');
-  const user = await getUserByToken(token);
-  if (!user) return res.status(401).json({ error: 'Usuario invalido' });
-  
-  try {
-    const { quiz } = req.body;
-    await saveQuiz(user.id, quiz);
-    res.json({ success: true });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.delete('/api/quizzes/:id', async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: 'Nao autenticado' });
-  const token = authHeader.replace(/^Bearer\s+/, '');
-  const user = await getUserByToken(token);
-  if (!user) return res.status(401).json({ error: 'Usuario invalido' });
-  
-  try {
-    await deleteQuiz(user.id, req.params.id);
-    res.json({ success: true });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
+  res.json(getAdminMetrics());
 });
 
 // Vite middleware in dev or static files in prod

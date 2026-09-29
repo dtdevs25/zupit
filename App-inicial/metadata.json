@@ -1,0 +1,6 @@
+{
+  "name": "Quizoot! - Quiz Multiplayer em Tempo Real",
+  "description": "Plataforma interativa de quiz multiplayer em tempo real estilo Kahoot com PIN de sala, ranking dinâmico e efeitos sonoros.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -15,7 +15,7 @@ import { QuizBuilder } from './components/QuizManager/QuizBuilder';
 import { AIGeneratorModal } from './components/QuizManager/AIGeneratorModal';
 import { SplitScreenView } from './components/SplitScreenView';
 import { MasterSidebar } from './components/MasterSidebar';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
 // Admin Dashboard Views
 import { AdminDashboard } from './components/Admin/AdminDashboard';
@@ -54,6 +54,14 @@ import { ConfirmModal } from './components/ConfirmModal';
 function AppContent() {
   const socket = useQuizSocket();
   const { user, token, allowance, isMaster, refreshAuth } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (user?.role === 'master' && location.pathname === '/') {
+      navigate('/admin');
+    }
+  }, [user, location, navigate]);
 
   // Local Quizzes State (Default + User Custom)
   const [quizzes, setQuizzes] = useState<Quiz[]>(() => {
@@ -94,6 +102,10 @@ function AppContent() {
       if (pinParam) {
         setUrlPin(pinParam);
         setCurrentView('home');
+      }
+      const splitParam = params.get('split');
+      if (splitParam === 'true') {
+        setCurrentView('split');
       }
     }
   }, []);
@@ -214,6 +226,12 @@ function AppContent() {
       setTimeout(() => {
         socket.createRoom(quiz, token || undefined);
       }, 350);
+    } else {
+      if (user?.role === 'master') {
+        navigate('/admin');
+      } else {
+        setCurrentView('quizzes');
+      }
     }
   };
 
@@ -228,14 +246,6 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-[#46178f] text-white flex flex-col font-['Montserrat',sans-serif]">
-      {/* Master Left Sidebar */}
-      {!activeRoom && (
-        <MasterSidebar
-          onToggleSplitScreen={() => setCurrentView(currentView === 'split' ? 'landing' : 'split')}
-          isSplitScreen={currentView === 'split'}
-        />
-      )}
-
       {/* Global Header (Hidden during game) */}
       {!activeRoom && (
         <Header
@@ -265,7 +275,7 @@ function AppContent() {
       )}
 
       {/* Main Content Area */}
-      <main className={`flex-1 flex flex-col ${isMaster && !activeRoom ? 'pl-16' : ''}`}>
+      <main className={`flex-1 flex flex-col`}>
         {activeRoom ? (
           // Active Game Room
           socket.isHost ? (
@@ -378,7 +388,7 @@ function AppContent() {
           // Pre-game Screens
           <>
             {currentView === 'split' ? (
-              <SplitScreenView onClose={() => setCurrentView('home')} />
+              <SplitScreenView onClose={() => setCurrentView('home')} quizzes={quizzes} />
             ) : currentView === 'quizzes' ? (
               <QuizSelector
                 quizzes={quizzes}

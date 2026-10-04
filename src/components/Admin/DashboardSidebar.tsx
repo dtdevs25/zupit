@@ -41,16 +41,11 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
         {isExpanded ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
       </button>
 
-      <div className={`p-6 flex flex-col ${isExpanded ? 'items-start' : 'items-center'}`}>
+      <div className={`p-6 flex flex-col items-center justify-center`}>
         {isExpanded ? (
-          <>
-            <h2 className="text-2xl font-black italic tracking-wider text-purple-300">
-              QUIZ<span className="text-yellow-400">ADMIN</span>
-            </h2>
-            <p className="text-xs text-purple-400 mt-1 uppercase tracking-widest font-semibold">Master Control</p>
-          </>
+           <img src="/superiortrofeu.png" alt="ZUPiT" className="h-12 object-contain" />
         ) : (
-          <h2 className="text-xl font-black italic text-yellow-400">Q<span className="text-purple-300">A</span></h2>
+           <img src="/superiortrofeu.png" alt="ZUPiT" className="h-8 object-contain" />
         )}
       </div>
 
@@ -78,6 +73,21 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
             </NavLink>
           );
         })}
+
+        {/* Custom Split Screen Button inside nav */}
+        <button
+          onClick={() => { window.location.href = '/?split=true'; }}
+          title={!isExpanded ? 'Apresentação (Split Screen)' : undefined}
+          className={`flex items-center gap-3 py-3 w-full rounded-xl font-bold transition-all ${
+            isExpanded ? 'px-4' : 'px-0 justify-center'
+          } text-blue-300 hover:bg-blue-900/50 hover:text-white mt-4 border border-blue-900/50`}
+        >
+          <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="12" y1="3" x2="12" y2="21"></line>
+          </svg>
+          {isExpanded && <span className="whitespace-nowrap">Apresentação (Split)</span>}
+        </button>
       </nav>
 
       <div className="p-3 border-t border-purple-800 mt-auto">

@@ -21,6 +21,9 @@ import {
   saveQuiz,
   getQuizzesByUser,
   deleteQuiz,
+  getAllQuizzesAdmin,
+  deleteQuizByAdmin,
+  toggleQuizPublicStatus,
 } from './serverAuth.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -1130,6 +1133,46 @@ app.get('/api/admin/metrics', async (req, res) => {
 });
 
 
+app.get('/api/admin/quizzes', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
+  const user = token ? await getUserByToken(token) : null;
+  if (!user || user.role !== 'master') {
+    return res.status(403).json({ error: 'Acesso restrito ao Usuário Master.' });
+  }
+  res.json({ quizzes: await getAllQuizzesAdmin() });
+});
+
+app.delete('/api/admin/quizzes/:id', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
+  const user = token ? await getUserByToken(token) : null;
+  if (!user || user.role !== 'master') {
+    return res.status(403).json({ error: 'Acesso restrito ao Usuário Master.' });
+  }
+  try {
+    await deleteQuizByAdmin(req.params.id);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.patch('/api/admin/quizzes/:id', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
+  const user = token ? await getUserByToken(token) : null;
+  if (!user || user.role !== 'master') {
+    return res.status(403).json({ error: 'Acesso restrito ao Usuário Master.' });
+  }
+  try {
+    const { isPublic } = req.body;
+    await toggleQuizPublicStatus(req.params.id, isPublic);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
 // ==========================================
 // Quiz CRUD Routes

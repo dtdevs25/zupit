@@ -470,3 +470,39 @@ export async function getQuizzesByUser(userId: string) {
 export async function deleteQuiz(userId: string, quizId: string) {
   await pool.query('DELETE FROM quizzes WHERE id = $1 AND user_id = $2', [quizId, userId]);
 }
+
+export async function getAllQuizzesAdmin() {
+  const quizzesRes = await pool.query('SELECT * FROM quizzes ORDER BY created_at DESC');
+  let quizzes = quizzesRes.rows;
+  
+  const result = [];
+  for (const q of quizzes) {
+    const questionsRes = await pool.query('SELECT * FROM questions WHERE quiz_id = $1 ORDER BY order_index ASC', [q.id]);
+    
+    // Fetch owner name
+    const ownerRes = await pool.query('SELECT name FROM users WHERE id = $1', [q.user_id]);
+    const ownerName = ownerRes.rows.length > 0 ? ownerRes.rows[0].name : 'Desconhecido';
+
+    result.push({
+      id: q.id,
+      title: q.title,
+      description: q.description,
+      category: q.category,
+      coverEmoji: q.cover_emoji,
+      isPublic: q.is_public,
+      ownerId: q.user_id,
+      ownerName: ownerName,
+      createdAt: Number(q.created_at),
+      questionsCount: questionsRes.rows.length,
+    });
+  }
+  return result;
+}
+
+export async function deleteQuizByAdmin(quizId: string) {
+  await pool.query('DELETE FROM quizzes WHERE id = $1', [quizId]);
+}
+
+export async function toggleQuizPublicStatus(quizId: string, isPublic: boolean) {
+  await pool.query('UPDATE quizzes SET is_public = $1 WHERE id = $2', [isPublic, quizId]);
+}

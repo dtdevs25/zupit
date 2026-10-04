@@ -22,6 +22,7 @@ import { AdminDashboard } from './components/Admin/AdminDashboard';
 import { Overview } from './components/Admin/pages/Overview';
 import { UsersManagement } from './components/Admin/pages/UsersManagement';
 import { PaymentsManagement } from './components/Admin/pages/PaymentsManagement';
+import { QuizzesManagement } from './components/Admin/pages/QuizzesManagement';
 
 // Host Views
 import { HostLobby } from './components/HostViews/HostLobby';
@@ -502,8 +503,8 @@ export default function App() {
               <Route index element={<Overview />} />
               <Route path="users" element={<UsersManagement />} />
               <Route path="payments" element={<PaymentsManagement />} />
+              <Route path="quizzes" element={<QuizzesManagement />} />
               {/* Em breve: */}
-              <Route path="quizzes" element={<div className="p-8 text-white">Quizzes (Em breve)</div>} />
               <Route path="logs" element={<div className="p-8 text-white">Logs (Em breve)</div>} />
               <Route path="settings" element={<div className="p-8 text-white">Configurações (Em breve)</div>} />
             </Route>

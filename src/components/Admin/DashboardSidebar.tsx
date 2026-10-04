@@ -42,7 +42,7 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
         {isExpanded ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
       </button>
 
-      <nav className="flex-1 px-3 space-y-1 mt-4 overflow-hidden flex flex-col justify-center">
+      <nav className="flex-1 px-3 space-y-1 mt-6 overflow-hidden flex flex-col justify-start">
         {links.map((link) => {
           const Icon = link.icon;
           return (
@@ -52,7 +52,7 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
               end={link.path === '/admin'}
               title={!isExpanded ? link.name : undefined}
               className={({ isActive }) =>
-                `flex items-center gap-3 py-2 rounded-xl text-sm font-bold transition-all ${
+                `flex items-center gap-3 py-2.5 rounded-xl font-bold transition-all ${
                   isExpanded ? 'px-4' : 'px-0 justify-center'
                 } ${
                   isActive
@@ -61,7 +61,7 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
                 }`
               }
             >
-              <Icon className="w-4 h-4 shrink-0" />
+              <Icon className="w-5 h-5 shrink-0" />
               {isExpanded && <span className="whitespace-nowrap">{link.name}</span>}
             </NavLink>
           );
@@ -71,11 +71,11 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
         <button
           onClick={() => { window.location.href = '/?split=true'; }}
           title={!isExpanded ? 'Jogar' : undefined}
-          className={`flex items-center gap-3 py-2 w-full rounded-xl text-sm font-bold transition-all ${
+          className={`flex items-center gap-3 py-2.5 w-full rounded-xl font-bold transition-all ${
             isExpanded ? 'px-4' : 'px-0 justify-center'
-          } text-blue-300 hover:bg-blue-900/50 hover:text-white mt-2 border border-blue-900/50`}
+          } text-blue-300 hover:bg-blue-900/50 hover:text-white mt-4 border border-blue-900/50`}
         >
-          <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="12" y1="3" x2="12" y2="21"></line>
           </svg>

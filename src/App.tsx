@@ -388,7 +388,7 @@ function AppContent() {
           // Pre-game Screens
           <>
             {currentView === 'split' ? (
-              <SplitScreenView onClose={() => setCurrentView('home')} />
+              <SplitScreenView onClose={() => { window.location.href = '/admin'; }} />
             ) : currentView === 'quizzes' ? (
               <QuizSelector
                 quizzes={quizzes}

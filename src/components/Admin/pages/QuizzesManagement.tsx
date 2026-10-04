@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { FileText, Trash2, Eye, EyeOff, Activity, RefreshCw } from 'lucide-react';
+import { FileText, Trash2, Eye, EyeOff, Activity, RefreshCw, Plus, Sparkles, PenLine } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import { AIGeneratorModal } from '../../QuizManager/AIGeneratorModal';
+import { QuizBuilder } from '../../QuizManager/QuizBuilder';
+import { Quiz } from '../../../types';
 
 interface AdminQuiz {
   id: string;
@@ -16,9 +19,14 @@ interface AdminQuiz {
 }
 
 export function QuizzesManagement() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [quizzes, setQuizzes] = useState<AdminQuiz[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Modals state
+  const [isBuilderOpen, setIsBuilderOpen] = useState(false);
+  const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
+  const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
 
   const fetchQuizzes = async () => {
     try {
@@ -70,6 +78,27 @@ export function QuizzesManagement() {
     }
   };
 
+  const handleSaveQuiz = async (newQuiz: Quiz) => {
+    try {
+      await fetch('/api/quizzes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ quiz: newQuiz })
+      });
+      fetchQuizzes();
+      setIsBuilderOpen(false);
+    } catch (e) {
+      console.error('Error saving quiz', e);
+    }
+  };
+
+  const handleQuizGenerated = async (newQuiz: Quiz) => {
+    await handleSaveQuiz(newQuiz);
+  };
+
   if (loading && quizzes.length === 0) {
     return (
       <div className="flex h-full items-center justify-center text-purple-300">
@@ -85,12 +114,26 @@ export function QuizzesManagement() {
           <h1 className="text-3xl font-black text-white">Quizzes & Conteúdo</h1>
           <p className="text-purple-300 mt-1">Gerencie todos os quizzes criados na plataforma.</p>
         </div>
-        <button 
-          onClick={fetchQuizzes}
-          className="bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 px-4 py-2 rounded-xl font-bold transition-colors flex items-center gap-2"
-        >
-          <RefreshCw className="w-5 h-5" /> Atualizar
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setIsAIGeneratorOpen(true)}
+            className="bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 hover:opacity-90 text-white px-4 py-2 rounded-xl font-bold transition-opacity flex items-center gap-2 shadow-lg"
+          >
+            <Sparkles className="w-4 h-4 text-yellow-300" /> Criar com IA
+          </button>
+          <button 
+            onClick={() => { setEditingQuiz(null); setIsBuilderOpen(true); }}
+            className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-xl font-bold transition-colors flex items-center gap-2"
+          >
+            <Plus className="w-5 h-5" /> Novo Quiz
+          </button>
+          <button 
+            onClick={fetchQuizzes}
+            className="bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 px-4 py-2 rounded-xl font-bold transition-colors flex items-center gap-2"
+          >
+            <RefreshCw className="w-5 h-5" />
+          </button>
+        </div>
       </header>
 
       <div className="bg-[#2b0e5c] border border-purple-800 rounded-2xl overflow-hidden shadow-xl">
@@ -141,7 +184,13 @@ export function QuizzesManagement() {
                   </td>
                   <td className="p-4 text-right">
                     <button 
-                      onClick={() => handleDelete(quiz)}
+                      onClick={() => {
+                        // Quick edit for master users: we can construct a partial Quiz object. 
+                        // However, /api/admin/quizzes does not return full questions array.
+                        // For a complete edit, we might need to fetch the full quiz first.
+                        // Since this is MVP, we'll just allow deletion or toggle public here.
+                        handleDelete(quiz)
+                      }}
                       className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors" 
                       title="Excluir Definitivamente"
                     >
@@ -159,6 +208,20 @@ export function QuizzesManagement() {
           </table>
         </div>
       </div>
+
+      {/* Modals */}
+      <QuizBuilder
+        isOpen={isBuilderOpen}
+        initialQuiz={editingQuiz}
+        onClose={() => setIsBuilderOpen(false)}
+        onSaveQuiz={handleSaveQuiz}
+      />
+
+      <AIGeneratorModal
+        isOpen={isAIGeneratorOpen}
+        onClose={() => setIsAIGeneratorOpen(false)}
+        onQuizGenerated={handleQuizGenerated}
+      />
     </div>
   );
 }

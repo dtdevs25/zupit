@@ -23,7 +23,6 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
     { name: 'Usuarios', path: '/admin/users', icon: Users },
     { name: 'Assinaturas', path: '/admin/payments', icon: CreditCard },
-    { name: 'Pagamentos', path: '/admin/payments', icon: CreditCard },
     { name: 'Quizes', path: '/admin/quizzes', icon: FileText },
     { name: 'Auditoria', path: '/admin/logs', icon: Activity },
     { name: 'Configurações', path: '/admin/settings', icon: Settings },

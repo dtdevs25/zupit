@@ -269,7 +269,7 @@ export function UsersManagement() {
       {/* Edit/Add Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#1a0a33] border border-purple-800 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+          <div className="bg-[#1a0a33] border border-purple-800 rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
             <h2 className="text-2xl font-black text-white mb-4">
               {modalMode === 'add' ? 'Adicionar Novo Usuário' : 'Editar Usuário'}
             </h2>

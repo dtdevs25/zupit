@@ -68,7 +68,7 @@ export const AIGeneratorModal: React.FC<AIGeneratorModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
-      <div className="bg-[#240b4d] border border-purple-700/60 rounded-3xl max-w-lg w-full p-6 sm:p-8 text-white shadow-2xl relative">
+      <div className="bg-[#240b4d] border border-purple-700/60 rounded-3xl max-w-lg w-full p-6 sm:p-8 text-white shadow-2xl relative max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
           disabled={loading}

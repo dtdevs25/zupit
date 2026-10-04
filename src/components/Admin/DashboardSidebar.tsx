@@ -20,11 +20,12 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const links = [
-    { name: 'Visão Geral', path: '/admin', icon: LayoutDashboard },
-    { name: 'Usuários', path: '/admin/users', icon: Users },
-    { name: 'Assinaturas & Pagamentos', path: '/admin/payments', icon: CreditCard },
-    { name: 'Quizzes & Conteúdo', path: '/admin/quizzes', icon: FileText },
-    { name: 'Auditoria & Logs', path: '/admin/logs', icon: Activity },
+    { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+    { name: 'Usuarios', path: '/admin/users', icon: Users },
+    { name: 'Assinaturas', path: '/admin/payments', icon: CreditCard },
+    { name: 'Pagamentos', path: '/admin/payments', icon: CreditCard },
+    { name: 'Quizes', path: '/admin/quizzes', icon: FileText },
+    { name: 'Auditoria', path: '/admin/logs', icon: Activity },
     { name: 'Configurações', path: '/admin/settings', icon: Settings },
   ];
 
@@ -41,12 +42,8 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
         {isExpanded ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
       </button>
 
-      <div className={`p-6 flex flex-col items-center justify-center`}>
-        {isExpanded ? (
-           <img src="/superiortrofeu.png" alt="ZUPiT" className="h-12 object-contain" />
-        ) : (
-           <img src="/superiortrofeu.png" alt="ZUPiT" className="h-8 object-contain" />
-        )}
+      <div className={`p-4 flex flex-col items-center justify-center`}>
+        {/* Empty per user request */}
       </div>
 
       <nav className="flex-1 px-3 space-y-2 mt-4 overflow-y-auto overflow-x-hidden">
@@ -74,19 +71,19 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
           );
         })}
 
-        {/* Custom Split Screen Button inside nav */}
+        {/* Custom Split Screen Button inside nav renamed to 'Jogar' */}
         <button
           onClick={() => { window.location.href = '/?split=true'; }}
-          title={!isExpanded ? 'Apresentação (Split Screen)' : undefined}
+          title={!isExpanded ? 'Jogar' : undefined}
           className={`flex items-center gap-3 py-3 w-full rounded-xl font-bold transition-all ${
             isExpanded ? 'px-4' : 'px-0 justify-center'
-          } text-blue-300 hover:bg-blue-900/50 hover:text-white mt-4 border border-blue-900/50`}
+          } text-blue-300 hover:bg-blue-900/50 hover:text-white border border-blue-900/50`}
         >
           <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="12" y1="3" x2="12" y2="21"></line>
           </svg>
-          {isExpanded && <span className="whitespace-nowrap">Apresentação (Split)</span>}
+          {isExpanded && <span className="whitespace-nowrap">Jogar</span>}
         </button>
       </nav>
 

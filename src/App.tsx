@@ -388,7 +388,7 @@ function AppContent() {
           // Pre-game Screens
           <>
             {currentView === 'split' ? (
-              <SplitScreenView onClose={() => setCurrentView('home')} quizzes={quizzes} />
+              <SplitScreenView onClose={() => setCurrentView('home')} />
             ) : currentView === 'quizzes' ? (
               <QuizSelector
                 quizzes={quizzes}

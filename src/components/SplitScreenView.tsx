@@ -12,17 +12,16 @@ import { PlayerResult } from './PlayerViews/PlayerResult';
 import { PlayerLeaderboard } from './PlayerViews/PlayerLeaderboard';
 import { PlayerPodium } from './PlayerViews/PlayerPodium';
 import { AvatarCustomizer } from './AvatarCustomizer';
-import { QuizSelector } from './QuizManager/QuizSelector';
-import { Quiz, CharacterConfig } from '../types';
+import { DEFAULT_QUIZZES } from '../data/defaultQuizzes';
+import { CharacterConfig } from '../types';
 import { CHARACTER_PRESETS } from './CharacterAvatar';
 import { Smartphone, Monitor, Bot, Sparkles, X, Palette } from 'lucide-react';
 
 interface SplitScreenViewProps {
   onClose: () => void;
-  quizzes: Quiz[];
 }
 
-export const SplitScreenView: React.FC<SplitScreenViewProps> = ({ onClose, quizzes }) => {
+export const SplitScreenView: React.FC<SplitScreenViewProps> = ({ onClose }) => {
   // Host connection
   const host = useQuizSocket();
   // Player connection
@@ -30,19 +29,27 @@ export const SplitScreenView: React.FC<SplitScreenViewProps> = ({ onClose, quizz
 
   const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
   const [playerCharacter, setPlayerCharacter] = useState<CharacterConfig>(CHARACTER_PRESETS[0].config);
-  
-  // Real quizzes (if passed or fetched, but QuizSelector fetches its own if we just render it)
 
-  // Join player automatically once host room is ready
+  // Create room on mount if not yet created
+  React.useEffect(() => {
+    if (host.isConnected && !host.pin) {
+      host.createRoom(DEFAULT_QUIZZES[0]);
+    }
+  }, [host.isConnected, host.pin]);
+
+  // Join player automatically once host room is ready, and populate with test players
   React.useEffect(() => {
     if (host.pin && player.isConnected && !player.pin) {
       player.joinRoom(host.pin, 'Você (Jogador) 📱', '🦊', '#e21b3c', playerCharacter);
+      // Automatically add bots after a brief moment so the user immediately sees competitors in the test
+      const botTimer = setTimeout(() => {
+        if (host.room?.state === 'LOBBY') {
+          host.addBots(4);
+        }
+      }, 600);
+      return () => clearTimeout(botTimer);
     }
-  }, [host.pin, player.isConnected, player.pin]);
-
-  const handleSelectQuiz = (quiz: Quiz) => {
-    host.createRoom(quiz);
-  };
+  }, [host.pin, player.isConnected, player.pin, host.room?.state, host.addBots]);
 
   const handleUpdateAvatar = (newConfig: CharacterConfig, newNickname?: string) => {
     setPlayerCharacter(newConfig);
@@ -59,20 +66,30 @@ export const SplitScreenView: React.FC<SplitScreenViewProps> = ({ onClose, quizz
       <div className="bg-[#2a0c54] border-b border-purple-800 px-4 py-2 flex items-center justify-between text-xs text-purple-200">
         <div className="flex items-center gap-2">
           <span className="px-2 py-0.5 rounded bg-yellow-400 text-purple-950 font-black uppercase text-[10px]">
-            Modo Apresentador + Jogador
+            Modo Teste Dividido
           </span>
           <span className="hidden sm:inline">
-            Apresente o jogo no telão e jogue pelo celular na mesma tela!
+            Veja a tela do Host (esquerda) e o celular do Jogador (direita) sincronizados em tempo real!
           </span>
         </div>
 
         <div className="flex items-center gap-2">
+          {host.room?.state === 'LOBBY' && (
+            <button
+              onClick={() => host.addBots(2)}
+              className="flex items-center gap-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded-lg shadow-sm transition-transform active:scale-95 cursor-pointer"
+            >
+              <Bot className="w-3.5 h-3.5" />
+              <span>+2 Jogadores Bots</span>
+            </button>
+          )}
+
           <button
             onClick={onClose}
             className="flex items-center gap-1 text-purple-300 hover:text-white font-bold bg-purple-900/60 px-2.5 py-1 rounded-lg border border-purple-700/60 transition-colors cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
-            <span>Sair do Modo Split</span>
+            <span>Sair do Modo Teste</span>
           </button>
         </div>
       </div>
@@ -139,16 +156,8 @@ export const SplitScreenView: React.FC<SplitScreenViewProps> = ({ onClose, quizz
                 )}
               </>
             ) : (
-              <div className="h-full bg-[#321066]">
-                <QuizSelector
-                  quizzes={quizzes}
-                  onSelectQuiz={handleSelectQuiz}
-                  onOpenBuilder={() => {}}
-                  onEditQuiz={() => {}}
-                  onDeleteQuiz={() => {}}
-                  onOpenAIGenerator={() => {}}
-                  onBackToHome={onClose}
-                />
+              <div className="flex items-center justify-center h-full text-purple-300 text-sm">
+                Iniciando sala do anfitrião...
               </div>
             )}
           </div>

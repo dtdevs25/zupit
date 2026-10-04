@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Users, FileText, CreditCard, Activity, DollarSign } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 
 interface Metrics {
   totalUsers: number;

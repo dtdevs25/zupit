@@ -1189,13 +1189,19 @@ app.post('/api/payments/create', async (req, res) => {
   if (!user) return res.status(401).json({ error: 'Usuário inválido' });
 
   try {
-    const { planType } = req.body; // 'basic' or 'pro'
+    const { planType } = req.body; // 'basic', 'basic_annual', 'pro', or 'pro_annual'
     let title = 'Assinatura Básica';
     let price = 8.99;
 
     if (planType === 'pro' || planType === 'unlimited') {
       title = 'Assinatura Ilimitada';
       price = 18.99;
+    } else if (planType === 'basic_annual') {
+      title = 'Assinatura Básica (Anual)';
+      price = 89.90;
+    } else if (planType === 'pro_annual' || planType === 'unlimited_annual') {
+      title = 'Assinatura Ilimitada (Anual)';
+      price = 189.90;
     }
 
     const preference = new Preference(mpClient);
@@ -1250,18 +1256,22 @@ app.post('/api/payments/webhook', express.json(), async (req, res) => {
           const [userId, planType] = externalReference.split('|');
           
           const updates: any = {};
-          if (planType === 'basic') {
+          if (planType === 'basic' || planType === 'basic_annual') {
             updates.planStatus = 'basic';
             updates.paidCredits = 10;
             updates.monthlyQuizzesLimit = 10;
             updates.maxParticipants = 30;
-            updates.notes = 'Assinatura Pacote Básico Ativa via MercadoPago (R$ 8,99)';
-          } else if (planType === 'pro' || planType === 'unlimited') {
+            updates.notes = planType === 'basic_annual' 
+              ? 'Assinatura Pacote Básico Anual Ativa via MercadoPago (R$ 89,90)' 
+              : 'Assinatura Pacote Básico Ativa via MercadoPago (R$ 8,99)';
+          } else if (planType.startsWith('pro') || planType.startsWith('unlimited')) {
             updates.planStatus = 'unlimited';
             updates.paidCredits = 9999;
             updates.monthlyQuizzesLimit = 999999;
             updates.maxParticipants = 999999;
-            updates.notes = 'Assinatura Pacote Master Ativa via MercadoPago (R$ 18,99)';
+            updates.notes = planType.includes('annual')
+              ? 'Assinatura Pacote Master Anual Ativa via MercadoPago (R$ 189,90)'
+              : 'Assinatura Pacote Master Ativa via MercadoPago (R$ 18,99)';
           }
 
           if (userId && planType) {

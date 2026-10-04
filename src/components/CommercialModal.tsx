@@ -16,6 +16,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
   const { user, token, refreshAuth } = useAuth();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
 
   if (!isOpen) return null;
 
@@ -26,13 +27,14 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
     }
     setLoadingAction(plan);
     try {
+      const planPayload = billingCycle === 'annual' ? `${plan}_annual` : plan;
       const res = await fetch('/api/payments/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ planType: plan === 'master' ? 'pro' : 'basic' })
+        body: JSON.stringify({ planType: planPayload === 'master' || planPayload === 'master_annual' ? planPayload.replace('master', 'pro') : planPayload })
       });
       const data = await res.json();
       if (data.init_point) {
@@ -78,6 +80,30 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
 
         {/* Content body */}
         <div className="p-4 sm:p-5 space-y-4">
+          {/* Billing Cycle Toggle */}
+          <div className="flex justify-center mb-6 mt-2">
+            <div className="bg-purple-900/40 p-1 rounded-full border border-purple-800/60 inline-flex relative">
+              <button
+                onClick={() => setBillingCycle('monthly')}
+                className={`relative z-10 px-6 py-2 text-xs font-bold rounded-full transition-colors ${billingCycle === 'monthly' ? 'text-white' : 'text-purple-400 hover:text-purple-200'}`}
+              >
+                Mensal
+              </button>
+              <button
+                onClick={() => setBillingCycle('annual')}
+                className={`relative z-10 px-6 py-2 text-xs font-bold rounded-full transition-colors flex items-center gap-1.5 ${billingCycle === 'annual' ? 'text-white' : 'text-purple-400 hover:text-purple-200'}`}
+              >
+                Anual
+                <span className="bg-green-500 text-white text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-black -mt-2">Desconto</span>
+              </button>
+              
+              {/* Sliding background indicator */}
+              <div 
+                className={`absolute top-1 bottom-1 w-1/2 bg-purple-600 rounded-full shadow-md transition-transform duration-300 ease-in-out ${billingCycle === 'annual' ? 'translate-x-full left-[-4px]' : 'translate-x-0 left-1'}`}
+              />
+            </div>
+          </div>
+
           {successMessage && (
             <div className="p-3.5 rounded-xl bg-emerald-900/80 border border-emerald-500/70 text-emerald-100 text-xs sm:text-sm flex items-center gap-3 animate-fadeIn">
               <Sparkles className="w-4 h-4 text-emerald-300 shrink-0" />
@@ -197,9 +223,16 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
 
                 <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-black text-white tracking-tight">R$ 8,99</span>
-                    <span className="text-[11px] text-purple-400 font-medium">/ mês</span>
+                    <span className="text-2xl font-black text-white tracking-tight">
+                      R$ {billingCycle === 'monthly' ? '8,99' : '89,90'}
+                    </span>
+                    <span className="text-[11px] text-purple-400 font-medium">
+                      / {billingCycle === 'monthly' ? 'mês' : 'ano'}
+                    </span>
                   </div>
+                  {billingCycle === 'annual' && (
+                    <div className="text-[10px] text-green-400 font-bold mt-1">Equivale a R$ 7,49 por mês</div>
+                  )}
                 </div>
 
                 <ul className="space-y-2.5 text-xs text-purple-200">
@@ -266,9 +299,16 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
 
                 <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-black text-yellow-400 tracking-tight">R$ 18,99</span>
-                    <span className="text-[11px] text-purple-300 font-medium">/ mês</span>
+                    <span className="text-2xl font-black text-yellow-400 tracking-tight">
+                      R$ {billingCycle === 'monthly' ? '18,99' : '189,90'}
+                    </span>
+                    <span className="text-[11px] text-purple-300 font-medium">
+                      / {billingCycle === 'monthly' ? 'mês' : 'ano'}
+                    </span>
                   </div>
+                  {billingCycle === 'annual' && (
+                    <div className="text-[10px] text-green-400 font-bold mt-1">Equivale a R$ 15,82 por mês</div>
+                  )}
                 </div>
 
                 <ul className="space-y-2.5 text-xs text-purple-100">

@@ -14,6 +14,7 @@ import { QuizSelector } from './components/QuizManager/QuizSelector';
 import { QuizBuilder } from './components/QuizManager/QuizBuilder';
 import { AIGeneratorModal } from './components/QuizManager/AIGeneratorModal';
 import { SplitScreenView } from './components/SplitScreenView';
+import { MasterNavbar } from './components/MasterNavbar';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Admin Dashboard Views
@@ -224,6 +225,14 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-[#46178f] text-white flex flex-col font-['Montserrat',sans-serif]">
+      {/* Master Top Navbar */}
+      {!activeRoom && (
+        <MasterNavbar
+          onToggleSplitScreen={() => setCurrentView(currentView === 'split' ? 'landing' : 'split')}
+          isSplitScreen={currentView === 'split'}
+        />
+      )}
+
       {/* Global Header (Hidden during game) */}
       {!activeRoom && (
         <Header
@@ -231,14 +240,7 @@ function AppContent() {
           soundEnabled={socket.soundEnabled}
           onToggleSound={socket.toggleSound}
           onLeaveRoom={undefined}
-          onToggleSplitScreen={
-            !activeRoom && isMaster
-              ? () => setCurrentView(currentView === 'split' ? 'landing' : 'split')
-              : undefined
-          }
-          isSplitScreen={currentView === 'split'}
           onOpenAuth={() => setIsAuthModalOpen(true)}
-          onOpenMaster={() => setIsMasterModalOpen(true)}
           onOpenPlans={() => setIsPlansModalOpen(true)}
           onLogoutSuccess={() => setCurrentView('landing')}
           onGoToHost={() => setCurrentView('quizzes')}

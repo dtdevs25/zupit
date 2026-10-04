@@ -59,19 +59,6 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          {/* Master Panel Button if user is Master */}
-          {isMaster && onOpenMaster && (
-            <button
-              onClick={onOpenMaster}
-              title="Acessar o Painel Administrativo Master"
-              className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-black bg-gradient-to-r from-yellow-400 to-amber-300 text-purple-950 shadow-md flex items-center gap-1.5 hover:from-yellow-300 hover:to-amber-200 transition-all cursor-pointer ring-2 ring-yellow-400/40"
-            >
-              <Crown className="w-3.5 h-3.5 fill-current" />
-              <span className="hidden sm:inline">Painel Master</span>
-              <span className="sm:hidden">Master</span>
-            </button>
-          )}
-
           {/* Host Panel button: visible when logged in (non-master) */}
           {user && !isMaster && onGoToHost && (
             <button
@@ -93,9 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="hidden md:flex flex-col text-left leading-tight">
                 <span className="font-bold text-gray-900 max-w-[100px] truncate">{user.name}</span>
                 <span className="text-[10px] text-purple-600">
-                  {isMaster
-                    ? 'Master Total'
-                    : user.planStatus === 'pro' || user.planStatus === 'unlimited'
+                  {user.planStatus === 'pro' || user.planStatus === 'unlimited'
                     ? 'Master Ilimitado'
                     : user.planStatus === 'basic'
                     ? `Básico (${user.paidCredits} quizzes)`
@@ -127,21 +112,6 @@ export const Header: React.FC<HeaderProps> = ({
                 <span>Login</span>
               </button>
             )
-          )}
-
-          {onToggleSplitScreen && (
-            <button
-              onClick={onToggleSplitScreen}
-              title="Modo Teste Dividido (Host + Jogador na mesma tela)"
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
-                isSplitScreen
-                  ? 'bg-yellow-400 text-purple-950 shadow-md font-extrabold ring-2 ring-yellow-300'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200'
-              }`}
-            >
-              <Columns className="w-4 h-4" />
-              <span className="hidden lg:inline">{isSplitScreen ? 'Tela Única' : 'Dividir Tela'}</span>
-            </button>
           )}
 
           {user && (

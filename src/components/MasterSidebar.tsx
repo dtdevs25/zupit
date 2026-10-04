@@ -16,17 +16,12 @@ export function MasterSidebar({ onToggleSplitScreen, isSplitScreen }: MasterSide
 
   return (
     <div 
-      className={`fixed left-0 top-0 h-full bg-[#110524] border-r border-purple-900 z-50 transition-all duration-300 flex flex-col ${
+      className={`fixed left-0 top-[61px] sm:top-[81px] h-[calc(100vh-61px)] sm:h-[calc(100vh-81px)] bg-[#110524] border-r border-purple-900 z-40 transition-all duration-300 flex flex-col ${
         isExpanded ? 'w-64' : 'w-16'
       }`}
     >
-      <div className="p-4 flex items-center justify-between border-b border-purple-900">
-        {isExpanded && (
-          <span className="flex items-center gap-2 text-yellow-400 font-black text-sm">
-            <Crown className="w-5 h-5" /> MODO MASTER
-          </span>
-        )}
-        {!isExpanded && <Crown className="w-6 h-6 text-yellow-400 mx-auto" />}
+      <div className="p-4 flex items-center justify-center border-b border-purple-900">
+        <Crown className="w-6 h-6 text-yellow-400" />
       </div>
 
       <button 
@@ -59,11 +54,6 @@ export function MasterSidebar({ onToggleSplitScreen, isSplitScreen }: MasterSide
       </div>
 
       <div className="p-4 border-t border-purple-900 mt-auto">
-        {isExpanded && (
-          <div className="mb-4 text-xs text-purple-400 font-semibold truncate px-2">
-            Admin: <span className="text-white">{user.name}</span>
-          </div>
-        )}
         <button 
           onClick={logout} 
           className={`flex items-center gap-3 p-3 w-full rounded-xl text-red-400 hover:bg-red-500/10 transition-colors ${!isExpanded ? 'justify-center' : ''}`}

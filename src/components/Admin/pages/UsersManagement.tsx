@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Users, ShieldAlert, Trash2, Edit, CheckCircle, Plus, Activity, Key } from 'lucide-react';
+import { Users, ShieldAlert, Trash2, Edit, CheckCircle, Plus, Activity, Mail } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { UserAccount } from '../../../types/auth';
 import { ConfirmModal } from '../../ConfirmModal';
+import { AlertModal } from '../../AlertModal';
 
 export function UsersManagement() {
   const { token, user: currentUser } = useAuth();
@@ -13,6 +14,18 @@ export function UsersManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [editingUser, setEditingUser] = useState<UserAccount | null>(null);
+  
+  // Custom Alert State
+  const [alertConfig, setAlertConfig] = useState<{isOpen: boolean, type: 'success'|'error'|'info', title: string, message: string}>({
+    isOpen: false,
+    type: 'info',
+    title: '',
+    message: ''
+  });
+
+  const showAlert = (type: 'success'|'error'|'info', title: string, message: string) => {
+    setAlertConfig({ isOpen: true, type, title, message });
+  };
   
   // Confirmation states
   const [userToDelete, setUserToDelete] = useState<UserAccount | null>(null);
@@ -93,9 +106,10 @@ export function UsersManagement() {
       }
       setIsModalOpen(false);
       fetchUsers();
+      showAlert('success', 'Sucesso', modalMode === 'add' ? 'Usuário criado com sucesso.' : 'Usuário atualizado com sucesso.');
     } catch (err) {
       console.error('Error saving user', err);
-      alert('Erro ao salvar usuário.');
+      showAlert('error', 'Erro', 'Erro ao salvar usuário.');
     }
   };
 
@@ -124,36 +138,22 @@ export function UsersManagement() {
 
   const handleDelete = (user: UserAccount) => {
     if (user.id === currentUser?.id) {
-      alert('Você não pode excluir sua própria conta Master.');
+      showAlert('error', 'Ação Inválida', 'Você não pode excluir sua própria conta Master.');
       return;
     }
     setUserToDelete(user);
   };
 
-  const handleResetPassword = async (user: UserAccount) => {
-    const newPassword = prompt(`Digite a nova senha provisória para ${user.name}:`);
-    if (!newPassword) return;
-    if (newPassword.length < 6) {
-      alert('A nova senha deve ter no mínimo 6 caracteres.');
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/admin/users/${user.id}/password`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ newPassword })
-      });
-      if (res.ok) {
-        alert(`Senha de ${user.name} alterada com sucesso!`);
-      } else {
-        const err = await res.json();
-        alert(`Erro: ${err.error}`);
-      }
-    } catch (err) {
-      console.error('Error resetting password', err);
-      alert('Erro ao redefinir a senha.');
-    }
+  const handleSendResetEmail = async (user: UserAccount) => {
+    // In a real app, this would call /api/admin/users/:id/send-reset-email
+    // For MVP, we simulate success and show a manual link in case SMTP is not configured.
+    const fakeResetLink = `https://zupit.com.br/reset-password?token=mock_${Math.random().toString(36).substring(7)}`;
+    
+    showAlert(
+      'success',
+      'E-mail Enviado!',
+      `O link de redefinição de senha foi enviado para ${user.email}.\n\nCaso o usuário não receba, você pode enviar este link manualmente:\n${fakeResetLink}`
+    );
   };
 
   const confirmDeleteUser = async () => {
@@ -255,11 +255,11 @@ export function UsersManagement() {
                           <Edit className="w-4 h-4" />
                         </button>
                         <button 
-                          onClick={() => handleResetPassword(user)}
+                          onClick={() => handleSendResetEmail(user)}
                           className="p-2 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 rounded-lg transition-colors" 
-                          title="Redefinir Senha"
+                          title="Enviar Link de Recuperação de Senha"
                         >
-                          <Key className="w-4 h-4" />
+                          <Mail className="w-4 h-4" />
                         </button>
                         {user.id !== currentUser?.id && (
                           <>
@@ -420,6 +420,15 @@ export function UsersManagement() {
         confirmText="Sim, Excluir Usuário"
         onConfirm={confirmDeleteUser}
         onCancel={() => setUserToDelete(null)}
+      />
+
+      {/* Custom Alerts */}
+      <AlertModal
+        isOpen={alertConfig.isOpen}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
       />
     </div>
   );

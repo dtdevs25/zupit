@@ -2,11 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { CreditCard, DollarSign, ArrowUpRight, CheckCircle, Activity, Link as LinkIcon } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { UserAccount } from '../../../types/auth';
+import { AlertModal } from '../../AlertModal';
 
 export function PaymentsManagement() {
   const { token } = useAuth();
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [alertConfig, setAlertConfig] = useState<{isOpen: boolean, type: 'success'|'error'|'info', title: string, message: string}>({
+    isOpen: false, type: 'info', title: '', message: ''
+  });
+
+  const showAlert = (type: 'success'|'error'|'info', title: string, message: string) => {
+    setAlertConfig({ isOpen: true, type, title, message });
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -55,10 +64,10 @@ export function PaymentsManagement() {
       const data = await res.json();
       if (data.init_point) {
         navigator.clipboard.writeText(data.init_point);
-        alert(`Link do Mercado Pago copiado para a área de transferência!\nPlano: ${plan.toUpperCase()}`);
+        showAlert('success', 'Link Copiado!', `O link do Mercado Pago foi copiado para a área de transferência!\nPlano: ${plan.toUpperCase()}`);
       }
     } catch (err) {
-      alert('Erro ao gerar link de pagamento.');
+      showAlert('error', 'Erro', 'Erro ao gerar link de pagamento.');
     }
   };
 
@@ -162,6 +171,14 @@ export function PaymentsManagement() {
           </table>
         </div>
       </div>
+      
+      <AlertModal
+        isOpen={alertConfig.isOpen}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+      />
     </div>
   );
 }

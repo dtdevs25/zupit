@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Check, Zap, Sparkles, Crown, ShieldCheck, HeartHandshake, PhoneCall } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { AlertModal } from './AlertModal';
 
 interface CommercialModalProps {
   isOpen: boolean;
@@ -17,6 +18,14 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+
+  const [alertConfig, setAlertConfig] = useState<{isOpen: boolean, type: 'success'|'error'|'info', title: string, message: string}>({
+    isOpen: false, type: 'info', title: '', message: ''
+  });
+
+  const showAlert = (type: 'success'|'error'|'info', title: string, message: string) => {
+    setAlertConfig({ isOpen: true, type, title, message });
+  };
 
   if (!isOpen) return null;
 
@@ -40,11 +49,11 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
       if (data.init_point) {
         window.location.href = data.init_point;
       } else {
-        alert('Erro ao gerar o link de pagamento.');
+        showAlert('error', 'Erro', 'Erro ao gerar o link de pagamento.');
       }
     } catch (err) {
       console.error(err);
-      alert('Erro de conexão ao processar pagamento.');
+      showAlert('error', 'Erro', 'Erro de conexão ao processar pagamento.');
     } finally {
       setLoadingAction(null);
     }
@@ -56,7 +65,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
       return;
     }
     // Para simplificar, créditos avulsos podem redirecionar para um link genérico ou no futuro implementarmos.
-    alert('A compra de créditos avulsos estará disponível em breve!');
+    showAlert('info', 'Em Breve', 'A compra de créditos avulsos estará disponível em breve!');
   };
 
   return (
@@ -357,10 +366,16 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
               </div>
             </div>
           </div>
-
-
         </div>
       </div>
+      
+      <AlertModal
+        isOpen={alertConfig.isOpen}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+      />
     </div>
   );
 };

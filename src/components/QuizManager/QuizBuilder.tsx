@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Quiz, QuizQuestion, KAHOOT_COLORS } from '../../types';
 import { Plus, Trash2, CheckCircle2, Clock, Award, Save, X } from 'lucide-react';
+import { AlertModal } from '../AlertModal';
 
 interface QuizBuilderProps {
   isOpen: boolean;
@@ -19,6 +20,15 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
   const [description, setDescription] = useState(initialQuiz?.description || '');
   const [category, setCategory] = useState(initialQuiz?.category || 'Geral');
   const [coverEmoji, setCoverEmoji] = useState(initialQuiz?.coverEmoji || '🎯');
+  
+  const [alertConfig, setAlertConfig] = useState<{isOpen: boolean, title: string, message: string}>({
+    isOpen: false, title: '', message: ''
+  });
+
+  const showAlert = (title: string, message: string) => {
+    setAlertConfig({ isOpen: true, title, message });
+  };
+
   const [questions, setQuestions] = useState<QuizQuestion[]>(
     initialQuiz?.questions || [
       {
@@ -131,16 +141,16 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i];
       if (!q.text.trim()) {
-        alert(`Por favor, preencha o texto da Pergunta ${i + 1}.`);
+        showAlert('Atenção', `Por favor, preencha o texto da Pergunta ${i + 1}.`);
         return;
       }
       const filledOptions = q.options.filter(o => o.text.trim().length > 0);
       if (filledOptions.length < 2) {
-        alert(`A Pergunta ${i + 1} precisa ter pelo menos 2 alternativas preenchidas.`);
+        showAlert('Atenção', `A Pergunta ${i + 1} precisa ter pelo menos 2 alternativas preenchidas.`);
         return;
       }
       if (!q.options[q.correctAnswer]?.text.trim()) {
-        alert(`A alternativa marcada como correta na Pergunta ${i + 1} não pode estar vazia.`);
+        showAlert('Atenção', `A alternativa marcada como correta na Pergunta ${i + 1} não pode estar vazia.`);
         return;
       }
     }
@@ -412,6 +422,14 @@ export const QuizBuilder: React.FC<QuizBuilderProps> = ({
           </div>
         </div>
       </div>
+
+      <AlertModal
+        isOpen={alertConfig.isOpen}
+        type="error"
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+      />
     </div>
   );
 };

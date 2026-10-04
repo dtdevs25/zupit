@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Activity, ShieldAlert, List, Clock } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 
 interface SystemLog {
   id: string;

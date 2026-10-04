@@ -25,6 +25,8 @@ import {
   getAllQuizzesAdmin,
   deleteQuizByAdmin,
   toggleQuizPublicStatus,
+  getSystemLogsAdmin,
+  logSystemAction
 } from './serverAuth.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -1134,6 +1136,16 @@ app.get('/api/admin/metrics', async (req, res) => {
 });
 
 
+app.get('/api/admin/logs', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
+  const user = token ? await getUserByToken(token) : null;
+  if (!user || user.role !== 'master') {
+    return res.status(403).json({ error: 'Acesso restrito ao Usuário Master.' });
+  }
+  res.json({ logs: await getSystemLogsAdmin() });
+});
+
 app.get('/api/admin/quizzes', async (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
@@ -1276,6 +1288,7 @@ app.post('/api/payments/webhook', express.json(), async (req, res) => {
 
           if (userId && planType) {
             await updateUserByAdmin(userId, updates);
+            await logSystemAction(userId, 'PAYMENT_APPROVED', `Assinatura ${planType} ativada via MercadoPago.`);
             console.log(`Payment confirmed! User ${userId} upgraded to ${planType}`);
           }
         }

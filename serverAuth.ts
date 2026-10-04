@@ -62,6 +62,14 @@ export async function initDb() {
         media_url TEXT,
         order_index INT NOT NULL
       );
+      
+      CREATE TABLE IF NOT EXISTS system_logs (
+        id VARCHAR(255) PRIMARY KEY,
+        user_id VARCHAR(255) REFERENCES users(id) ON DELETE SET NULL,
+        action VARCHAR(255) NOT NULL,
+        details TEXT,
+        created_at BIGINT NOT NULL
+      );
     `);
     
     // Create or update master user
@@ -505,4 +513,34 @@ export async function deleteQuizByAdmin(quizId: string) {
 
 export async function toggleQuizPublicStatus(quizId: string, isPublic: boolean) {
   await pool.query('UPDATE quizzes SET is_public = $1 WHERE id = $2', [isPublic, quizId]);
+}
+
+export async function logSystemAction(userId: string | null, action: string, details: string = '') {
+  try {
+    await pool.query(`
+      INSERT INTO system_logs (id, user_id, action, details, created_at)
+      VALUES ($1, $2, $3, $4, $5)
+    `, [crypto.randomUUID(), userId, action, details, Date.now()]);
+  } catch (err) {
+    console.error('Failed to write system log', err);
+  }
+}
+
+export async function getSystemLogsAdmin() {
+  const res = await pool.query(`
+    SELECT l.*, u.name as user_name, u.email as user_email
+    FROM system_logs l
+    LEFT JOIN users u ON l.user_id = u.id
+    ORDER BY l.created_at DESC
+    LIMIT 200
+  `);
+  return res.rows.map(r => ({
+    id: r.id,
+    userId: r.user_id,
+    userName: r.user_name || 'Sistema',
+    userEmail: r.user_email,
+    action: r.action,
+    details: r.details,
+    createdAt: Number(r.created_at)
+  }));
 }

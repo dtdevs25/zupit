@@ -23,6 +23,7 @@ import { Overview } from './components/Admin/pages/Overview';
 import { UsersManagement } from './components/Admin/pages/UsersManagement';
 import { PaymentsManagement } from './components/Admin/pages/PaymentsManagement';
 import { QuizzesManagement } from './components/Admin/pages/QuizzesManagement';
+import { LogsManagement } from './components/Admin/pages/LogsManagement';
 
 // Host Views
 import { HostLobby } from './components/HostViews/HostLobby';
@@ -504,8 +505,7 @@ export default function App() {
               <Route path="users" element={<UsersManagement />} />
               <Route path="payments" element={<PaymentsManagement />} />
               <Route path="quizzes" element={<QuizzesManagement />} />
-              {/* Em breve: */}
-              <Route path="logs" element={<div className="p-8 text-white">Logs (Em breve)</div>} />
+              <Route path="logs" element={<LogsManagement />} />
               <Route path="settings" element={<div className="p-8 text-white">Configurações (Em breve)</div>} />
             </Route>
           </Routes>

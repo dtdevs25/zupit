@@ -58,7 +58,7 @@ function AppContent() {
   const location = useLocation();
 
   useEffect(() => {
-    if (user?.role === 'master' && location.pathname === '/') {
+    if (user?.role === 'master' && location.pathname === '/' && !location.search.includes('split=true')) {
       navigate('/admin');
     }
   }, [user, location, navigate]);

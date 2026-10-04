@@ -42,11 +42,7 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
         {isExpanded ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
       </button>
 
-      <div className={`p-4 flex flex-col items-center justify-center`}>
-        {/* Empty per user request */}
-      </div>
-
-      <nav className="flex-1 px-3 space-y-2 mt-4 overflow-y-auto overflow-x-hidden">
+      <nav className="flex-1 px-3 space-y-1 mt-4 overflow-hidden flex flex-col justify-center">
         {links.map((link) => {
           const Icon = link.icon;
           return (
@@ -56,7 +52,7 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
               end={link.path === '/admin'}
               title={!isExpanded ? link.name : undefined}
               className={({ isActive }) =>
-                `flex items-center gap-3 py-3 rounded-xl font-bold transition-all ${
+                `flex items-center gap-3 py-2 rounded-xl text-sm font-bold transition-all ${
                   isExpanded ? 'px-4' : 'px-0 justify-center'
                 } ${
                   isActive
@@ -65,7 +61,7 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
                 }`
               }
             >
-              <Icon className="w-5 h-5 shrink-0" />
+              <Icon className="w-4 h-4 shrink-0" />
               {isExpanded && <span className="whitespace-nowrap">{link.name}</span>}
             </NavLink>
           );
@@ -75,30 +71,17 @@ export function DashboardSidebar({ onLogout }: SidebarProps) {
         <button
           onClick={() => { window.location.href = '/?split=true'; }}
           title={!isExpanded ? 'Jogar' : undefined}
-          className={`flex items-center gap-3 py-3 w-full rounded-xl font-bold transition-all ${
+          className={`flex items-center gap-3 py-2 w-full rounded-xl text-sm font-bold transition-all ${
             isExpanded ? 'px-4' : 'px-0 justify-center'
-          } text-blue-300 hover:bg-blue-900/50 hover:text-white border border-blue-900/50`}
+          } text-blue-300 hover:bg-blue-900/50 hover:text-white mt-2 border border-blue-900/50`}
         >
-          <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="12" y1="3" x2="12" y2="21"></line>
           </svg>
           {isExpanded && <span className="whitespace-nowrap">Jogar</span>}
         </button>
       </nav>
-
-      <div className="p-3 border-t border-purple-800 mt-auto">
-        <button
-          onClick={onLogout}
-          title={!isExpanded ? 'Sair do Painel' : undefined}
-          className={`flex items-center gap-3 py-3 w-full rounded-xl font-bold text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors ${
-            isExpanded ? 'px-4' : 'px-0 justify-center'
-          }`}
-        >
-          <LogOut className="w-5 h-5 shrink-0" />
-          {isExpanded && <span className="whitespace-nowrap">Sair do Painel</span>}
-        </button>
-      </div>
     </aside>
   );
 }

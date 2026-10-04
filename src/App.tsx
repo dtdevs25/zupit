@@ -14,7 +14,7 @@ import { QuizSelector } from './components/QuizManager/QuizSelector';
 import { QuizBuilder } from './components/QuizManager/QuizBuilder';
 import { AIGeneratorModal } from './components/QuizManager/AIGeneratorModal';
 import { SplitScreenView } from './components/SplitScreenView';
-import { MasterNavbar } from './components/MasterNavbar';
+import { MasterSidebar } from './components/MasterSidebar';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Admin Dashboard Views
@@ -224,10 +224,10 @@ function AppContent() {
   const activeRoom = socket.room;
 
   return (
-    <div className="min-h-screen bg-[#46178f] text-white flex flex-col font-['Montserrat',sans-serif]">
-      {/* Master Top Navbar */}
+    <div className={`min-h-screen bg-[#46178f] text-white flex flex-col font-['Montserrat',sans-serif] ${isMaster && !activeRoom ? 'pl-16' : ''}`}>
+      {/* Master Left Sidebar */}
       {!activeRoom && (
-        <MasterNavbar
+        <MasterSidebar
           onToggleSplitScreen={() => setCurrentView(currentView === 'split' ? 'landing' : 'split')}
           isSplitScreen={currentView === 'split'}
         />

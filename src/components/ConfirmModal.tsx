@@ -7,6 +7,7 @@ interface ConfirmModalProps {
   message: string;
   onConfirm: () => void;
   onCancel: () => void;
+  confirmText?: string;
 }
 
 export const ConfirmModal: React.FC<ConfirmModalProps> = ({
@@ -15,6 +16,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   message,
   onConfirm,
   onCancel,
+  confirmText = 'Sim, Excluir',
 }) => {
   if (!isOpen) return null;
 
@@ -49,7 +51,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
               onClick={onConfirm}
               className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold shadow-lg shadow-red-600/20 transition-all active:scale-95"
             >
-              Sim, Excluir
+              {confirmText}
             </button>
           </div>
         </div>

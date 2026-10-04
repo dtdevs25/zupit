@@ -3,6 +3,7 @@ import { FileText, Trash2, Eye, EyeOff, Activity, RefreshCw, Plus, Sparkles, Pen
 import { useAuth } from '../../../context/AuthContext';
 import { AIGeneratorModal } from '../../QuizManager/AIGeneratorModal';
 import { QuizBuilder } from '../../QuizManager/QuizBuilder';
+import { ConfirmModal } from '../../ConfirmModal';
 import { Quiz } from '../../../types';
 
 interface AdminQuiz {
@@ -23,10 +24,10 @@ export function QuizzesManagement() {
   const [quizzes, setQuizzes] = useState<AdminQuiz[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Modals state
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
+  const [quizToDelete, setQuizToDelete] = useState<AdminQuiz | null>(null);
 
   const fetchQuizzes = async () => {
     try {
@@ -64,17 +65,22 @@ export function QuizzesManagement() {
     }
   };
 
-  const handleDelete = async (quiz: AdminQuiz) => {
-    if (confirm(`Tem certeza que deseja excluir o quiz "${quiz.title}"? Esta ação não pode ser desfeita.`)) {
-      try {
-        await fetch(`/api/admin/quizzes/${quiz.id}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        fetchQuizzes();
-      } catch (err) {
-        console.error('Error deleting quiz', err);
-      }
+  const handleDelete = (quiz: AdminQuiz) => {
+    setQuizToDelete(quiz);
+  };
+
+  const confirmDeleteQuiz = async () => {
+    if (!quizToDelete) return;
+    try {
+      await fetch(`/api/admin/quizzes/${quizToDelete.id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      fetchQuizzes();
+    } catch (err) {
+      console.error('Error deleting quiz', err);
+    } finally {
+      setQuizToDelete(null);
     }
   };
 
@@ -221,6 +227,15 @@ export function QuizzesManagement() {
         isOpen={isAIGeneratorOpen}
         onClose={() => setIsAIGeneratorOpen(false)}
         onQuizGenerated={handleQuizGenerated}
+      />
+
+      <ConfirmModal
+        isOpen={!!quizToDelete}
+        title="Excluir Quiz Definitivamente"
+        message={`Tem certeza que deseja excluir o quiz "${quizToDelete?.title}"? Esta ação não pode ser desfeita e todos os dados associados serão perdidos.`}
+        confirmText="Sim, Excluir Quiz"
+        onConfirm={confirmDeleteQuiz}
+        onCancel={() => setQuizToDelete(null)}
       />
     </div>
   );

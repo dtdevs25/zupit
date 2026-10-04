@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Users, ShieldAlert, Trash2, Edit, CheckCircle, Plus, Activity } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { UserAccount } from '../../../types/auth';
+import { ConfirmModal } from '../../ConfirmModal';
 
 export function UsersManagement() {
   const { token, user: currentUser } = useAuth();
@@ -12,6 +13,10 @@ export function UsersManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [editingUser, setEditingUser] = useState<UserAccount | null>(null);
+  
+  // Confirmation states
+  const [userToDelete, setUserToDelete] = useState<UserAccount | null>(null);
+  const [userToBlock, setUserToBlock] = useState<UserAccount | null>(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -94,39 +99,49 @@ export function UsersManagement() {
     }
   };
 
-  const handleToggleBlock = async (user: UserAccount) => {
-    const isBlocked = user.planStatus === 'blocked';
+  const handleToggleBlock = (user: UserAccount) => {
+    setUserToBlock(user);
+  };
+
+  const confirmToggleBlock = async () => {
+    if (!userToBlock) return;
+    const isBlocked = userToBlock.planStatus === 'blocked';
     const newStatus = isBlocked ? 'free_trial' : 'blocked';
     
-    if (confirm(isBlocked ? `Desbloquear ${user.name}?` : `Bloquear o acesso de ${user.name}?`)) {
-      try {
-        await fetch(`/api/admin/users/${user.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({ planStatus: newStatus })
-        });
-        fetchUsers();
-      } catch (err) {
-        console.error('Error toggling block', err);
-      }
+    try {
+      await fetch(`/api/admin/users/${userToBlock.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ planStatus: newStatus })
+      });
+      fetchUsers();
+    } catch (err) {
+      console.error('Error toggling block', err);
+    } finally {
+      setUserToBlock(null);
     }
   };
 
-  const handleDelete = async (user: UserAccount) => {
+  const handleDelete = (user: UserAccount) => {
     if (user.id === currentUser?.id) {
       alert('Você não pode excluir sua própria conta Master.');
       return;
     }
-    if (confirm(`Tem CERTEZA que deseja excluir permanentemente o usuário ${user.name}?`)) {
-      try {
-        await fetch(`/api/admin/users/${user.id}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        fetchUsers();
-      } catch (err) {
-        console.error('Error deleting user', err);
-      }
+    setUserToDelete(user);
+  };
+
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return;
+    try {
+      await fetch(`/api/admin/users/${userToDelete.id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      fetchUsers();
+    } catch (err) {
+      console.error('Error deleting user', err);
+    } finally {
+      setUserToDelete(null);
     }
   };
 
@@ -353,6 +368,27 @@ export function UsersManagement() {
           </div>
         </div>
       )}
+      {/* Block Confirm Modal */}
+      <ConfirmModal
+        isOpen={!!userToBlock}
+        title={userToBlock?.planStatus === 'blocked' ? "Desbloquear Usuário" : "Bloquear Usuário"}
+        message={userToBlock?.planStatus === 'blocked' 
+          ? `Tem certeza que deseja restaurar o acesso de "${userToBlock?.name}"?` 
+          : `Tem certeza que deseja suspender o acesso de "${userToBlock?.name}"? Ele não poderá mais logar na plataforma.`}
+        confirmText={userToBlock?.planStatus === 'blocked' ? "Sim, Desbloquear" : "Sim, Bloquear"}
+        onConfirm={confirmToggleBlock}
+        onCancel={() => setUserToBlock(null)}
+      />
+
+      {/* Delete Confirm Modal */}
+      <ConfirmModal
+        isOpen={!!userToDelete}
+        title="Excluir Usuário Definitivamente"
+        message={`Tem certeza que deseja excluir permanentemente o usuário "${userToDelete?.name}"? Esta ação não poderá ser desfeita e todos os dados associados serão perdidos.`}
+        confirmText="Sim, Excluir Usuário"
+        onConfirm={confirmDeleteUser}
+        onCancel={() => setUserToDelete(null)}
+      />
     </div>
   );
 }

@@ -14,6 +14,13 @@ import { QuizSelector } from './components/QuizManager/QuizSelector';
 import { QuizBuilder } from './components/QuizManager/QuizBuilder';
 import { AIGeneratorModal } from './components/QuizManager/AIGeneratorModal';
 import { SplitScreenView } from './components/SplitScreenView';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+// Admin Dashboard Views
+import { AdminDashboard } from './components/Admin/AdminDashboard';
+import { Overview } from './components/Admin/pages/Overview';
+import { UsersManagement } from './components/Admin/pages/UsersManagement';
+import { PaymentsManagement } from './components/Admin/pages/PaymentsManagement';
 
 // Host Views
 import { HostLobby } from './components/HostViews/HostLobby';
@@ -477,10 +484,45 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <GameAudioProvider>
-        <AppContent />
-      </GameAudioProvider>
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <GameAudioProvider>
+          <Routes>
+            {/* Rota principal (Jogo) */}
+            <Route path="/*" element={<AppContent />} />
+            
+            {/* Rotas de Administração */}
+            <Route path="/admin" element={
+              <AdminProtectedRoute>
+                <AdminDashboard />
+              </AdminProtectedRoute>
+            }>
+              <Route index element={<Overview />} />
+              <Route path="users" element={<UsersManagement />} />
+              <Route path="payments" element={<PaymentsManagement />} />
+              {/* Em breve: */}
+              <Route path="quizzes" element={<div className="p-8 text-white">Quizzes (Em breve)</div>} />
+              <Route path="logs" element={<div className="p-8 text-white">Logs (Em breve)</div>} />
+              <Route path="settings" element={<div className="p-8 text-white">Configurações (Em breve)</div>} />
+            </Route>
+          </Routes>
+        </GameAudioProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
+}
+
+// Wrapper to protect Admin Routes
+function AdminProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, isMaster } = useAuth();
+  
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+  
+  if (!isMaster) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return <>{children}</>;
 }

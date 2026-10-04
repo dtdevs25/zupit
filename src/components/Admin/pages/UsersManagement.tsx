@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Users, ShieldAlert, Trash2, Edit, CheckCircle, Plus, Activity } from 'lucide-react';
+import { Users, ShieldAlert, Trash2, Edit, CheckCircle, Plus, Activity, Key } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { UserAccount } from '../../../types/auth';
 import { ConfirmModal } from '../../ConfirmModal';
@@ -130,6 +130,32 @@ export function UsersManagement() {
     setUserToDelete(user);
   };
 
+  const handleResetPassword = async (user: UserAccount) => {
+    const newPassword = prompt(`Digite a nova senha provisória para ${user.name}:`);
+    if (!newPassword) return;
+    if (newPassword.length < 6) {
+      alert('A nova senha deve ter no mínimo 6 caracteres.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}/password`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ newPassword })
+      });
+      if (res.ok) {
+        alert(`Senha de ${user.name} alterada com sucesso!`);
+      } else {
+        const err = await res.json();
+        alert(`Erro: ${err.error}`);
+      }
+    } catch (err) {
+      console.error('Error resetting password', err);
+      alert('Erro ao redefinir a senha.');
+    }
+  };
+
   const confirmDeleteUser = async () => {
     if (!userToDelete) return;
     try {
@@ -158,7 +184,6 @@ export function UsersManagement() {
       <header className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-black text-white">Gestão de Usuários</h1>
-          <p className="text-purple-300 mt-1">Gerencie cadastros, acessos e limites de todos os usuários.</p>
         </div>
         <button 
           onClick={handleOpenAdd}
@@ -228,6 +253,13 @@ export function UsersManagement() {
                           title="Editar/Adicionar Créditos"
                         >
                           <Edit className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleResetPassword(user)}
+                          className="p-2 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 rounded-lg transition-colors" 
+                          title="Redefinir Senha"
+                        >
+                          <Key className="w-4 h-4" />
                         </button>
                         {user.id !== currentUser?.id && (
                           <>

@@ -349,6 +349,13 @@ export async function updateUserByAdmin(id: string, updates: Partial<UserAccount
   return mapDbToUser(u);
 }
 
+export async function changeUserPasswordByAdmin(id: string, newPassword: string): Promise<void> {
+  const res = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+  if (res.rows.length === 0) throw new Error('Usuário não encontrado.');
+  
+  await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hashPassword(newPassword), id]);
+}
+
 export async function deleteUserByAdmin(id: string): Promise<void> {
   const res = await pool.query('DELETE FROM users WHERE id = $1', [id]);
   if (res.rowCount === 0) throw new Error('Usuário não encontrado.');

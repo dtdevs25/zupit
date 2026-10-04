@@ -52,7 +52,6 @@ export function Overview() {
     <div className="space-y-6">
       <header>
         <h1 className="text-3xl font-black text-white">Visão Geral</h1>
-        <p className="text-purple-300 mt-1">Métricas reais do sistema baseadas no banco de dados.</p>
       </header>
 
       {/* Stats Grid */}

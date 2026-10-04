@@ -71,7 +71,6 @@ export function SettingsManagement() {
       <header className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-black text-white">Configurações</h1>
-          <p className="text-purple-300 mt-1">Gerencie seu perfil Master e preferências globais.</p>
         </div>
       </header>
 

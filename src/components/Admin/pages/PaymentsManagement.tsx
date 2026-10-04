@@ -66,7 +66,6 @@ export function PaymentsManagement() {
     <div className="space-y-6 pb-20">
       <header>
         <h1 className="text-3xl font-black text-white">Assinaturas e Pagamentos</h1>
-        <p className="text-purple-300 mt-1">Controle o faturamento e os pagamentos via Mercado Pago.</p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

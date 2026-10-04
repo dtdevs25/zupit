@@ -51,7 +51,6 @@ export function LogsManagement() {
       <header className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-black text-white">Auditoria & Logs</h1>
-          <p className="text-purple-300 mt-1">Histórico completo de ações, bloqueios e pagamentos.</p>
         </div>
       </header>
 

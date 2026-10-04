@@ -118,7 +118,6 @@ export function QuizzesManagement() {
       <header className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-black text-white">Quizzes & Conteúdo</h1>
-          <p className="text-purple-300 mt-1">Gerencie todos os quizzes criados na plataforma.</p>
         </div>
         <div className="flex items-center gap-3">
           <button 

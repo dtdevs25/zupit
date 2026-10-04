@@ -26,7 +26,8 @@ import {
   deleteQuizByAdmin,
   toggleQuizPublicStatus,
   getSystemLogsAdmin,
-  logSystemAction
+  logSystemAction,
+  changeUserPasswordByAdmin
 } from './serverAuth.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -1105,6 +1106,27 @@ app.patch('/api/admin/users/:id', async (req, res) => {
   try {
     const updated = await updateUserByAdmin(req.params.id, req.body);
     res.json({ user: updated, metrics: await getAdminMetrics() });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.patch('/api/admin/users/:id/password', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
+  const user = token ? await getUserByToken(token) : null;
+
+  if (!user || user.role !== 'master') {
+    return res.status(403).json({ error: 'Acesso negado. Apenas masters podem alterar senhas de outros usuários.' });
+  }
+  
+  try {
+    const { newPassword } = req.body;
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ error: 'A nova senha deve ter pelo menos 6 caracteres.' });
+    }
+    await changeUserPasswordByAdmin(req.params.id, newPassword);
+    res.json({ success: true });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }

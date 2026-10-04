@@ -224,7 +224,7 @@ function AppContent() {
   const activeRoom = socket.room;
 
   return (
-    <div className={`min-h-screen bg-[#46178f] text-white flex flex-col font-['Montserrat',sans-serif] ${isMaster && !activeRoom ? 'pl-16' : ''}`}>
+    <div className="min-h-screen bg-[#46178f] text-white flex flex-col font-['Montserrat',sans-serif]">
       {/* Master Left Sidebar */}
       {!activeRoom && (
         <MasterSidebar
@@ -262,7 +262,7 @@ function AppContent() {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col">
+      <main className={`flex-1 flex flex-col ${isMaster && !activeRoom ? 'pl-16' : ''}`}>
         {activeRoom ? (
           // Active Game Room
           socket.isHost ? (

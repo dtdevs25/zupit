@@ -1216,9 +1216,9 @@ app.post('/api/payments/create', async (req, res) => {
         },
         external_reference: user.id + '|' + planType,
         back_urls: {
-          success: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/`,
-          failure: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/`,
-          pending: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/`
+          success: 'https://sg4.ehspro.com.br/',
+          failure: 'https://sg4.ehspro.com.br/',
+          pending: 'https://sg4.ehspro.com.br/'
         },
         auto_return: 'approved',
       }

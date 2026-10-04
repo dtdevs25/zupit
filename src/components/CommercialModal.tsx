@@ -13,7 +13,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
   onClose,
   onOpenAuth,
 }) => {
-  const { user, simulateUpgrade, refreshAuth } = useAuth();
+  const { user, token, refreshAuth } = useAuth();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
@@ -26,16 +26,23 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
     }
     setLoadingAction(plan);
     try {
-      await simulateUpgrade(plan);
-      await refreshAuth();
-      if (plan === 'basic') {
-        setSuccessMessage('🎉 Pacote Básico ativado com sucesso! Você tem 10 quizzes no mês e até 30 participantes por sala.');
+      const res = await fetch('/api/payments/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ planType: plan === 'master' ? 'pro' : 'basic' })
+      });
+      const data = await res.json();
+      if (data.init_point) {
+        window.location.href = data.init_point;
       } else {
-        setSuccessMessage('👑 Pacote Master ativado com sucesso! Quizzes e participantes totalmente ilimitados no mês.');
+        alert('Erro ao gerar o link de pagamento.');
       }
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 4000);
+    } catch (err) {
+      console.error(err);
+      alert('Erro de conexão ao processar pagamento.');
     } finally {
       setLoadingAction(null);
     }
@@ -46,17 +53,8 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
       onOpenAuth?.();
       return;
     }
-    setLoadingAction(`credits_${count}`);
-    try {
-      await simulateUpgrade(undefined, count);
-      await refreshAuth();
-      setSuccessMessage(`⚡ Pacote de +${count} quizzes adicionado à sua conta com sucesso!`);
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 4000);
-    } finally {
-      setLoadingAction(null);
-    }
+    // Para simplificar, créditos avulsos podem redirecionar para um link genérico ou no futuro implementarmos.
+    alert('A compra de créditos avulsos estará disponível em breve!');
   };
 
   return (

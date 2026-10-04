@@ -6,6 +6,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
+import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { DEFAULT_QUIZZES } from './src/data/defaultQuizzes.ts';
 import { Quiz, Player, GameState, RoomState, QuizQuestion, CharacterConfig } from './src/types.ts';
 import {
@@ -1171,6 +1172,109 @@ app.patch('/api/admin/quizzes/:id', async (req, res) => {
     res.json({ success: true });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
+  }
+});
+
+// ==========================================
+// Mercado Pago Routes
+// ==========================================
+
+const mpClient = new MercadoPagoConfig({ accessToken: process.env.ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN || '' });
+
+app.post('/api/payments/create', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Não autenticado' });
+  const token = authHeader.replace(/^Bearer\s+/, '');
+  const user = await getUserByToken(token);
+  if (!user) return res.status(401).json({ error: 'Usuário inválido' });
+
+  try {
+    const { planType } = req.body; // 'basic' or 'pro'
+    let title = 'Assinatura Básica';
+    let price = 8.99;
+
+    if (planType === 'pro' || planType === 'unlimited') {
+      title = 'Assinatura Ilimitada';
+      price = 18.99;
+    }
+
+    const preference = new Preference(mpClient);
+    
+    const result = await preference.create({
+      body: {
+        items: [
+          {
+            id: planType,
+            title: title,
+            quantity: 1,
+            unit_price: price,
+            currency_id: 'BRL',
+          }
+        ],
+        payer: {
+          email: user.email,
+        },
+        external_reference: user.id + '|' + planType,
+        back_urls: {
+          success: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/`,
+          failure: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/`,
+          pending: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/`
+        },
+        auto_return: 'approved',
+      }
+    });
+
+    res.json({ init_point: result.init_point });
+  } catch (error: any) {
+    console.error('Error creating MP preference:', error);
+    res.status(500).json({ error: 'Erro ao gerar pagamento.' });
+  }
+});
+
+app.post('/api/payments/webhook', express.json(), async (req, res) => {
+  console.log('Webhook Mercado Pago recebido:', req.body);
+  try {
+    const topic = req.query.topic || req.body.type;
+    if (topic === 'payment') {
+      const paymentId = req.query.id || req.body.data.id;
+      
+      // Consult the actual payment API from MP using fetch because SDK sometimes requires extra types
+      const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+        headers: { Authorization: `Bearer ${process.env.ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN || ''}` }
+      });
+      const paymentData = await response.json();
+
+      if (paymentData.status === 'approved') {
+        const externalReference = paymentData.external_reference;
+        if (externalReference) {
+          const [userId, planType] = externalReference.split('|');
+          
+          const updates: any = {};
+          if (planType === 'basic') {
+            updates.planStatus = 'basic';
+            updates.paidCredits = 10;
+            updates.monthlyQuizzesLimit = 10;
+            updates.maxParticipants = 30;
+            updates.notes = 'Assinatura Pacote Básico Ativa via MercadoPago (R$ 8,99)';
+          } else if (planType === 'pro' || planType === 'unlimited') {
+            updates.planStatus = 'unlimited';
+            updates.paidCredits = 9999;
+            updates.monthlyQuizzesLimit = 999999;
+            updates.maxParticipants = 999999;
+            updates.notes = 'Assinatura Pacote Master Ativa via MercadoPago (R$ 18,99)';
+          }
+
+          if (userId && planType) {
+            await updateUserByAdmin(userId, updates);
+            console.log(`Payment confirmed! User ${userId} upgraded to ${planType}`);
+          }
+        }
+      }
+    }
+    res.status(200).send('OK');
+  } catch (err) {
+    console.error('Error handling webhook', err);
+    res.status(500).send('Error');
   }
 });
 

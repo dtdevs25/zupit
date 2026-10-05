@@ -413,7 +413,13 @@ function AppContent() {
                   setIsBuilderOpen(true);
                 }}
                 onOpenAIGenerator={() => setIsAIGeneratorOpen(true)}
-                onBackToHome={() => setCurrentView('home')}
+                onBackToHome={() => {
+                  if (user?.role === 'master') {
+                    window.location.href = '/admin';
+                  } else {
+                    setCurrentView('home');
+                  }
+                }}
               />
             ) : currentView === 'landing' ? (
               <LandingPage

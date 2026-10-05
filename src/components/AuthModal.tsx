@@ -22,28 +22,44 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     setLoading(true);
 
     try {
-      if (mode === 'register') {
+      if (forgotMode) {
+        if (!email.trim() || !email.includes('@')) throw new Error('Digite um e-mail válido.');
+        const res = await fetch('/api/auth/request-password-reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim() })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        setSuccess('Se o e-mail estiver cadastrado, você receberá um link para redefinir a senha.');
+        setForgotMode(false);
+      } else if (mode === 'register') {
         if (!name.trim()) throw new Error('Digite seu nome.');
         if (!email.trim() || !email.includes('@')) throw new Error('Digite um e-mail válido.');
         if (password.length < 4) throw new Error('A senha deve ter ao menos 4 caracteres.');
         await register(name.trim(), email.trim(), password);
+        onSuccess?.();
+        onClose();
       } else {
         if (!email.trim()) throw new Error('Digite seu e-mail.');
         if (!password) throw new Error('Digite sua senha.');
         await login(email.trim(), password);
+        onSuccess?.();
+        onClose();
       }
-      onSuccess?.();
-      onClose();
     } catch (err: any) {
       setError(err.message || 'Erro ao processar. Tente novamente.');
     } finally {
@@ -83,9 +99,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <span className="font-medium">{error}</span>
             </div>
           )}
+          {success && (
+            <div className="mb-6 p-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm flex items-center gap-2">
+              <ShieldAlert className="w-5 h-5 shrink-0" />
+              <span className="font-medium">{success}</span>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-3">
-            {mode === 'register' && (
+            {mode === 'register' && !forgotMode && (
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1">Nome completo</label>
                 <input
@@ -111,59 +133,77 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Senha</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-white border-2 border-gray-200 rounded-xl pl-3 pr-10 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/20 transition-all font-medium text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-              {mode === 'login' && (
-                <div className="text-right mt-1.5">
-                  <button type="button" className="text-[11px] font-bold text-purple-600 hover:text-purple-800 transition-colors cursor-pointer">
-                    Esqueci a senha
+            {!forgotMode && (
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Senha</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required={!forgotMode}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full bg-white border-2 border-gray-200 rounded-xl pl-3 pr-10 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/20 transition-all font-medium text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-              )}
-            </div>
+                {mode === 'login' && (
+                  <div className="text-right mt-1.5">
+                    <button 
+                      type="button" 
+                      onClick={() => { setForgotMode(true); setError(null); setSuccess(null); }}
+                      className="text-[11px] font-bold text-purple-600 hover:text-purple-800 transition-colors cursor-pointer"
+                    >
+                      Esqueci a senha
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             <button
               type="submit"
               disabled={loading}
               className="w-full py-3 mt-1 bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-base rounded-xl shadow-lg transition-transform active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
             >
-              {loading ? 'Aguarde...' : mode === 'register' ? 'Criar minha conta' : 'Entrar'}
+              {loading ? 'Aguarde...' : forgotMode ? 'Recuperar Senha' : mode === 'register' ? 'Criar minha conta' : 'Entrar'}
               {!loading && <ArrowRight className="w-4 h-4" />}
             </button>
           </form>
 
           {/* Footer toggle */}
           <div className="mt-4 text-center border-t border-gray-100 pt-3">
-            <p className="text-sm text-gray-600 font-medium">
-              {mode === 'login' ? 'Ainda não tem acesso?' : 'Já possui uma conta?'}
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setMode(mode === 'login' ? 'register' : 'login');
-                setError(null);
-              }}
-              className="mt-2 text-purple-700 font-bold hover:text-purple-900 transition-colors cursor-pointer"
-            >
-              {mode === 'login' ? 'Criar um usuário agora' : 'Fazer login'}
-            </button>
+            {forgotMode ? (
+              <button
+                type="button"
+                onClick={() => { setForgotMode(false); setError(null); setSuccess(null); }}
+                className="mt-2 text-purple-700 font-bold hover:text-purple-900 transition-colors cursor-pointer text-sm"
+              >
+                Voltar para o Login
+              </button>
+            ) : (
+              <>
+                <p className="text-sm text-gray-600 font-medium">
+                  {mode === 'login' ? 'Ainda não tem acesso?' : 'Já possui uma conta?'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode(mode === 'login' ? 'register' : 'login');
+                    setError(null);
+                  }}
+                  className="mt-2 text-purple-700 font-bold hover:text-purple-900 transition-colors cursor-pointer"
+                >
+                  {mode === 'login' ? 'Criar um usuário agora' : 'Fazer login'}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

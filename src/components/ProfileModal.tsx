@@ -57,16 +57,27 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
 
   const handlePasswordReset = async () => {
     try {
-      // Simulate password reset logic (usually POST /api/auth/reset-password)
-      // Since it's simulated as per user conversation:
+      const res = await fetch('/api/auth/request-password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
       setAlertState({
         isOpen: true,
-        title: 'Redefinição de Senha',
-        message: `Simulando envio de e-mail de redefinição para ${email}... Quando configurarmos o servidor de e-mail real, um link seguro chegará lá.`,
-        type: 'info'
+        title: 'E-mail Enviado!',
+        message: 'O link para redefinição de senha foi enviado para o seu e-mail com sucesso.',
+        type: 'success'
       });
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      setAlertState({
+        isOpen: true,
+        title: 'Erro',
+        message: err.message || 'Erro ao solicitar redefinição de senha.',
+        type: 'error'
+      });
     }
   };
 

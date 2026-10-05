@@ -30,9 +30,11 @@ import {
   logSystemAction,
   getPlatformSettings,
   updatePlatformSettings,
-  changeUserPasswordByAdmin
-  changeUserPasswordByAdmin
+  changeUserPasswordByAdmin,
+  createPasswordResetToken,
+  resetPasswordWithToken
 } from './serverAuth.ts';
+import { sendWelcomeEmail, sendPasswordResetEmail } from './serverEmail.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -985,6 +987,10 @@ app.post('/api/auth/register', async (req, res) => {
     }
     const result = await registerUser(name || 'Usuário', email, password);
     const allowance = checkAllowance(result.user);
+    
+    // Envia o e-mail de boas-vindas sem bloquear a resposta
+    sendWelcomeEmail(email, name || 'Usuário').catch(console.error);
+    
     res.json({ ...result, allowance });
   } catch (err: any) {
     res.status(400).json({ error: err.message || 'Erro ao registrar.' });
@@ -1031,6 +1037,37 @@ app.post('/api/auth/allowance/check', async (req, res) => {
   const user = token ? await getUserByToken(token) : null;
   const allowance = checkAllowance(user);
   res.json(allowance);
+});
+
+app.post('/api/auth/request-password-reset', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'E-mail é obrigatório.' });
+    
+    const tokenData = await createPasswordResetToken(email);
+    if (tokenData) {
+      // Envia o email de reset sem bloquear
+      sendPasswordResetEmail(email, tokenData.name, tokenData.token).catch(console.error);
+    }
+    // Sempre retorna sucesso para não vazar emails cadastrados
+    res.json({ success: true, message: 'Se o e-mail existir, você receberá um link de redefinição.' });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword || newPassword.length < 4) {
+      return res.status(400).json({ error: 'Token inválido ou senha muito curta.' });
+    }
+    
+    await resetPasswordWithToken(token, newPassword);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 app.post('/api/auth/simulate-upgrade', async (req, res) => {
@@ -1086,7 +1123,12 @@ app.post('/api/admin/users', async (req, res) => {
   }
   try {
     const { name, email, password, planStatus, paidCredits, notes } = req.body;
-    const created = await registerUser(name, email, password || 'senha123');
+    const pwd = password || 'senha123';
+    const created = await registerUser(name, email, pwd);
+    
+    // Send email when admin creates the user
+    sendWelcomeEmail(email, name, pwd).catch(console.error);
+    
     if (planStatus || paidCredits !== undefined || notes) {
       await updateUserByAdmin(created.user.id, {
         planStatus: planStatus || 'free_trial',

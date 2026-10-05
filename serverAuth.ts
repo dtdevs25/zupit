@@ -32,8 +32,13 @@ export async function initDb() {
         created_at BIGINT NOT NULL,
         last_login_at BIGINT NOT NULL,
         notes TEXT,
-        password_hash VARCHAR(255) NOT NULL
+        password_hash VARCHAR(255) NOT NULL,
+        reset_token VARCHAR(255),
+        reset_token_expires BIGINT
       );
+
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token VARCHAR(255);
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires BIGINT;
       
       CREATE TABLE IF NOT EXISTS quizzes (
         id VARCHAR(255) PRIMARY KEY,
@@ -185,6 +190,29 @@ export async function getUserByToken(token: string): Promise<UserAccount | null>
   } catch (e) {
     return null;
   }
+}
+
+export async function createPasswordResetToken(email: string): Promise<{ token: string, name: string } | null> {
+  const cleanEmail = email.trim().toLowerCase();
+  const res = await pool.query('SELECT id, name FROM users WHERE email = $1', [cleanEmail]);
+  if (res.rows.length === 0) return null;
+  
+  const token = crypto.randomUUID();
+  const expires = Date.now() + 1000 * 60 * 60; // 1 hour
+  
+  await pool.query('UPDATE users SET reset_token = $1, reset_token_expires = $2 WHERE id = $3', [token, expires, res.rows[0].id]);
+  return { token, name: res.rows[0].name };
+}
+
+export async function resetPasswordWithToken(token: string, newPassword: string): Promise<void> {
+  const res = await pool.query('SELECT id, reset_token_expires FROM users WHERE reset_token = $1', [token]);
+  if (res.rows.length === 0) throw new Error('Token inválido ou expirado.');
+  
+  if (Date.now() > res.rows[0].reset_token_expires) {
+    throw new Error('Token expirado.');
+  }
+  
+  await pool.query('UPDATE users SET password_hash = $1, reset_token = NULL, reset_token_expires = NULL WHERE id = $2', [hashPassword(newPassword), res.rows[0].id]);
 }
 
 export async function registerUser(name: string, email: string, password: string): Promise<{ user: UserAccount; token: string }> {

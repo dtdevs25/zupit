@@ -40,6 +40,7 @@ import { PlayerQuestion } from './components/PlayerViews/PlayerQuestion';
 import { PlayerResult } from './components/PlayerViews/PlayerResult';
 import { PlayerLeaderboard } from './components/PlayerViews/PlayerLeaderboard';
 import { PlayerPodium } from './components/PlayerViews/PlayerPodium';
+import { ResetPassword } from './components/ResetPassword';
 
 import { AlertCircle, X } from 'lucide-react';
 import { GameAudioProvider } from './context/GameAudioContext';
@@ -514,6 +515,9 @@ export default function App() {
           <Routes>
             {/* Rota principal (Jogo) */}
             <Route path="/*" element={<AppContent />} />
+            
+            {/* Rota de Redefinição de Senha */}
+            <Route path="/reset-password" element={<ResetPassword />} />
             
             {/* Rotas de Administração */}
             <Route path="/admin" element={

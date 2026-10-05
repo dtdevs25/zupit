@@ -68,6 +68,12 @@ export async function initDb() {
         order_index INT NOT NULL
       );
       
+      CREATE TABLE IF NOT EXISTS quiz_assignments (
+        quiz_id VARCHAR(255) REFERENCES quizzes(id) ON DELETE CASCADE,
+        user_id VARCHAR(255) REFERENCES users(id) ON DELETE CASCADE,
+        PRIMARY KEY (quiz_id, user_id)
+      );
+
       CREATE TABLE IF NOT EXISTS system_logs (
         id VARCHAR(255) PRIMARY KEY,
         user_id VARCHAR(255) REFERENCES users(id) ON DELETE SET NULL,
@@ -529,9 +535,10 @@ export async function getAllQuizzesForMasterPlay() {
 
 export async function getQuizzesByUser(userId: string) {
   const quizzesRes = await pool.query(`
-    SELECT * FROM quizzes 
-    WHERE user_id = $1 OR is_public = true 
-    ORDER BY updated_at DESC
+    SELECT DISTINCT q.* FROM quizzes q
+    LEFT JOIN quiz_assignments qa ON q.id = qa.quiz_id
+    WHERE q.user_id = $1 OR q.is_public = true OR qa.user_id = $1
+    ORDER BY q.updated_at DESC
   `, [userId]);
   let quizzes = quizzesRes.rows;
   
@@ -610,6 +617,29 @@ export async function changeQuizOwnerAdmin(quizId: string, newOwnerId: string) {
   if (res.rows.length === 0) throw new Error('Usuário não encontrado.');
   await pool.query('UPDATE quizzes SET user_id = $1 WHERE id = $2', [newOwnerId, quizId]);
   await logSystemAction(null, 'QUIZ_OWNER_CHANGED', `Quiz ${quizId} transferido para usuário ${newOwnerId}.`);
+}
+
+export async function getQuizAssignmentsAdmin(quizId: string): Promise<string[]> {
+  const res = await pool.query('SELECT user_id FROM quiz_assignments WHERE quiz_id = $1', [quizId]);
+  return res.rows.map(r => r.user_id);
+}
+
+export async function setQuizAssignmentsAdmin(quizId: string, userIds: string[]) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('DELETE FROM quiz_assignments WHERE quiz_id = $1', [quizId]);
+    for (const uid of userIds) {
+      await client.query('INSERT INTO quiz_assignments (quiz_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [quizId, uid]);
+    }
+    await client.query('COMMIT');
+    await logSystemAction(null, 'QUIZ_ACCESS_CHANGED', `Acessos atualizados para o quiz ${quizId}.`);
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function logSystemAction(userId: string | null, action: string, details: string = '') {

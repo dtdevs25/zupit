@@ -1288,6 +1288,40 @@ app.patch('/api/admin/quizzes/:id', async (req, res) => {
   }
 });
 
+app.get('/api/admin/quizzes/:id/assignments', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
+  const user = token ? await getUserByToken(token) : null;
+  if (!user || user.role !== 'master') {
+    return res.status(403).json({ error: 'Acesso restrito ao Usuário Master.' });
+  }
+  try {
+    const { getQuizAssignmentsAdmin } = await import('./serverAuth.ts');
+    const userIds = await getQuizAssignmentsAdmin(req.params.id);
+    res.json({ assignments: userIds });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/admin/quizzes/:id/assignments', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
+  const user = token ? await getUserByToken(token) : null;
+  if (!user || user.role !== 'master') {
+    return res.status(403).json({ error: 'Acesso restrito ao Usuário Master.' });
+  }
+  try {
+    const { userIds } = req.body;
+    if (!Array.isArray(userIds)) throw new Error('userIds must be an array');
+    const { setQuizAssignmentsAdmin } = await import('./serverAuth.ts');
+    await setQuizAssignmentsAdmin(req.params.id, userIds);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 // ==========================================
 // Mercado Pago Routes
 // ==========================================

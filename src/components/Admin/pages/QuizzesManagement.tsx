@@ -31,8 +31,8 @@ export function QuizzesManagement() {
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
   const [quizToDelete, setQuizToDelete] = useState<AdminQuiz | null>(null);
-  const [quizToTransfer, setQuizToTransfer] = useState<AdminQuiz | null>(null);
-  const [transferTargetUserId, setTransferTargetUserId] = useState<string>('');
+  const [quizToManageAccess, setQuizToManageAccess] = useState<AdminQuiz | null>(null);
+  const [assignedUserIds, setAssignedUserIds] = useState<string[]>([]);
 
   const [alertConfig, setAlertConfig] = useState<{isOpen: boolean; type: 'success' | 'error'; title: string; message: string}>({
     isOpen: false, type: 'success', title: '', message: ''
@@ -123,27 +123,42 @@ export function QuizzesManagement() {
     await handleSaveQuiz(newQuiz);
   };
 
-  const confirmTransferQuiz = async () => {
-    if (!quizToTransfer || !transferTargetUserId) return;
+  const openManageAccess = async (quiz: AdminQuiz) => {
+    setQuizToManageAccess(quiz);
+    setAssignedUserIds([]);
     try {
-      const res = await fetch(`/api/admin/quizzes/${quizToTransfer.id}`, {
-        method: 'PATCH',
+      const res = await fetch(`/api/admin/quizzes/${quiz.id}/assignments`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.assignments) {
+        setAssignedUserIds(data.assignments);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const confirmManageAccess = async () => {
+    if (!quizToManageAccess) return;
+    try {
+      const res = await fetch(`/api/admin/quizzes/${quizToManageAccess.id}/assignments`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ ownerId: transferTargetUserId })
+        body: JSON.stringify({ userIds: assignedUserIds })
       });
-      if (!res.ok) throw new Error('Erro ao transferir quiz');
+      if (!res.ok) throw new Error('Erro ao atualizar acessos');
       
-      showAlert('success', 'Sucesso!', `Quiz transferido com sucesso.`);
-      fetchQuizzesAndUsers();
+      showAlert('success', 'Sucesso!', `Acessos atualizados com sucesso.`);
     } catch (err) {
       console.error(err);
-      showAlert('error', 'Erro', 'Falha ao transferir o quiz.');
+      showAlert('error', 'Erro', 'Falha ao atualizar acessos do quiz.');
     } finally {
-      setQuizToTransfer(null);
-      setTransferTargetUserId('');
+      setQuizToManageAccess(null);
+      setAssignedUserIds([]);
     }
   };
 
@@ -232,14 +247,11 @@ export function QuizzesManagement() {
                   <td className="p-4 text-right">
                     <div className="flex justify-end gap-2">
                       <button 
-                        onClick={() => {
-                          setQuizToTransfer(quiz);
-                          setTransferTargetUserId(quiz.ownerId);
-                        }}
+                        onClick={() => openManageAccess(quiz)}
                         className="px-3 py-1 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg transition-colors text-xs font-bold" 
-                        title="Vincular a Usuário"
+                        title="Gerenciar Acessos"
                       >
-                        Vincular
+                        Acessos
                       </button>
                       <button 
                         onClick={() => handleDelete(quiz)}
@@ -285,37 +297,51 @@ export function QuizzesManagement() {
         onCancel={() => setQuizToDelete(null)}
       />
 
-      {/* Transfer Quiz Modal */}
-      {quizToTransfer && (
+      {/* Manage Access Modal */}
+      {quizToManageAccess && (
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#240b4d] border border-purple-600 rounded-3xl w-full max-w-sm shadow-2xl p-6 relative animate-in fade-in zoom-in duration-200">
-            <h2 className="text-xl font-black text-white mb-4">Vincular Quiz</h2>
-            <p className="text-sm text-purple-200 mb-6">Selecione o novo proprietário do quiz "{quizToTransfer.title}":</p>
+          <div className="bg-[#240b4d] border border-purple-600 rounded-3xl w-full max-w-lg shadow-2xl p-6 relative animate-in fade-in zoom-in duration-200">
+            <h2 className="text-xl font-black text-white mb-2">Acessos: {quizToManageAccess.title}</h2>
+            <p className="text-sm text-purple-200 mb-6">Selecione os usuários que poderão ver e usar este quiz (o dono original já tem acesso):</p>
             
-            <select
-              value={transferTargetUserId}
-              onChange={(e) => setTransferTargetUserId(e.target.value)}
-              className="w-full bg-[#1a0a33] border border-purple-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-purple-500 mb-6"
-            >
-              <option value="">Selecione um usuário...</option>
-              {users.map(u => (
-                <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+            <div className="max-h-60 overflow-y-auto mb-6 bg-[#1a0a33] border border-purple-700 rounded-xl p-2 space-y-1">
+              {users.filter(u => u.id !== quizToManageAccess.ownerId).map(u => (
+                <label key={u.id} className="flex items-center gap-3 p-2 hover:bg-purple-900/30 rounded-lg cursor-pointer transition-colors">
+                  <input 
+                    type="checkbox"
+                    className="w-4 h-4 rounded border-purple-500 text-purple-600 focus:ring-purple-500 bg-purple-900/50"
+                    checked={assignedUserIds.includes(u.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setAssignedUserIds([...assignedUserIds, u.id]);
+                      } else {
+                        setAssignedUserIds(assignedUserIds.filter(id => id !== u.id));
+                      }
+                    }}
+                  />
+                  <div>
+                    <span className="block text-sm font-bold text-white">{u.name}</span>
+                    <span className="block text-xs text-purple-400">{u.email}</span>
+                  </div>
+                </label>
               ))}
-            </select>
+              {users.filter(u => u.id !== quizToManageAccess.ownerId).length === 0 && (
+                <div className="p-4 text-center text-purple-400 text-sm">Nenhum outro usuário cadastrado.</div>
+              )}
+            </div>
 
             <div className="flex gap-3">
               <button
-                onClick={() => setQuizToTransfer(null)}
+                onClick={() => setQuizToManageAccess(null)}
                 className="flex-1 py-3 rounded-xl bg-purple-900/50 hover:bg-purple-800 text-white font-bold transition-colors"
               >
                 Cancelar
               </button>
               <button
-                onClick={confirmTransferQuiz}
-                disabled={!transferTargetUserId || transferTargetUserId === quizToTransfer.ownerId}
-                className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold transition-colors"
+                onClick={confirmManageAccess}
+                className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-colors"
               >
-                Confirmar
+                Salvar Acessos
               </button>
             </div>
           </div>

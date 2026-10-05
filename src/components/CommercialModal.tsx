@@ -72,9 +72,9 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
     <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 z-50 animate-fadeIn">
       <div className="bg-[#200742] border-2 border-purple-700/80 rounded-3xl max-w-5xl w-full max-h-[95vh] flex flex-col text-white shadow-2xl relative overflow-hidden">
         {/* Header */}
-        <div className="p-4 border-b border-purple-800/80 flex items-center justify-between bg-[#190533] shrink-0">
+        <div className="p-3 border-b border-purple-800/80 flex items-center justify-between bg-[#190533] shrink-0">
           <div>
-            <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-yellow-400 block">
+            <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-yellow-400 block">
               Planos & Preços
             </span>
           </div>
@@ -88,7 +88,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
         </div>
 
         {/* Content body */}
-        <div className="p-3 sm:p-4 space-y-3 overflow-y-auto flex-1">
+        <div className="p-3 space-y-3 overflow-y-auto flex-1">
           {/* Billing Cycle Toggle */}
           <div className="flex justify-center mb-4 mt-3">
             <div className="relative">
@@ -135,13 +135,13 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
             {/* Free Trial Card */}
             <div className="bg-[#19052f] border border-purple-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-purple-600/80 transition-all">
               <div>
-                <div className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-purple-400 mb-0.5">
                   Teste Inicial
                 </div>
-                <h3 className="text-lg font-black text-white">Plano Grátis</h3>
-                <p className="text-[11px] text-purple-300 mt-0.5">Para experimentar a plataforma</p>
+                <h3 className="text-base font-black text-white">Plano Grátis</h3>
+                <p className="text-[10px] text-purple-300 mt-0.5">Para experimentar a plataforma</p>
 
-                <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60 flex flex-col justify-center">
+                <div className="mt-2 mb-3 pb-2 border-b border-purple-800/60 flex flex-col justify-center">
                   <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-black text-white tracking-tight">R$ 0</span>
                     <span className="text-[11px] text-purple-400 font-medium">/ 1 quiz</span>
@@ -149,34 +149,34 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                   <div className="text-[10px] opacity-0 mt-1 pointer-events-none select-none">.</div>
                 </div>
 
-                <ul className="space-y-2.5 text-xs text-purple-200">
-                  <li className="flex items-center gap-2">
+                <ul className="space-y-1.5 text-[11px] text-purple-200">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>1 Partida completa de teste</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Até <strong className="text-white">15 participantes</strong> por sala</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Editor de Quizzes e Personagens</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Ranking dinâmico e efeitos sonoros</span>
                   </li>
                 </ul>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-purple-800/60">
+              <div className="mt-4 pt-3 border-t border-purple-800/60">
                 {!user ? (
                   <button
                     onClick={() => {
                       onClose();
                       onOpenAuth?.();
                     }}
-                    className="w-full py-2.5 bg-purple-800/80 hover:bg-purple-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer border border-purple-600/50"
+                    className="w-full py-2 bg-purple-800/80 hover:bg-purple-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer border border-purple-600/50"
                   >
                     Começar Grátis
                   </button>
@@ -187,7 +187,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                 ) : (
                   <button
                     onClick={onClose}
-                    className="w-full py-2.5 bg-purple-800/80 hover:bg-purple-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer border border-purple-600/50"
+                    className="w-full py-2 bg-purple-800/80 hover:bg-purple-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer border border-purple-600/50"
                   >
                     Usar Quiz Grátis
                   </button>
@@ -200,20 +200,20 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
               user?.planStatus === 'basic' ? 'border-2 border-indigo-400 shadow-lg shadow-indigo-500/10' : 'border border-purple-600/70 hover:border-purple-400'
             }`}>
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300">
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-300">
                     Intermediário
                   </span>
                   {user?.planStatus === 'basic' && (
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+                    <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
                       Plano Atual
                     </span>
                   )}
                 </div>
-                <h3 className="text-lg font-black text-white">Plano Prata</h3>
-                <p className="text-[11px] text-purple-300 mt-0.5">Para professores e salas de aula</p>
+                <h3 className="text-base font-black text-white">Plano Prata</h3>
+                <p className="text-[10px] text-purple-300 mt-0.5">Para professores e salas de aula</p>
 
-                <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60 flex flex-col justify-center">
+                <div className="mt-2 mb-3 pb-2 border-b border-purple-800/60 flex flex-col justify-center">
                   <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-black text-white tracking-tight">
                       R$ {billingCycle === 'monthly' ? '8,99' : '89,90'}
@@ -227,24 +227,24 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                   </div>
                 </div>
 
-                <ul className="space-y-2.5 text-xs text-purple-200">
-                  <li className="flex items-center gap-2">
+                <ul className="space-y-1.5 text-[11px] text-purple-200">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span><strong className="text-white">10 Quizzes</strong> no mês</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Até <strong className="text-white">30 participantes</strong> por sala</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Salas ao vivo com PIN rápido</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Histórico e relatórios de rodadas</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Editor completo com temas e avatares</span>
                   </li>
@@ -255,7 +255,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                 <button
                   onClick={() => handleActivatePlan('basic')}
                   disabled={loadingAction === 'basic' || user?.planStatus === 'basic'}
-                  className={`w-full py-2.5 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98 ${
+                  className={`w-full py-2 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98 ${
                     user?.planStatus === 'basic'
                       ? 'bg-purple-900/60 text-purple-300 border border-purple-700/60 cursor-default'
                       : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-md'
@@ -273,23 +273,23 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
             </div>
 
             {/* Master Unlimited Card (R$ 18,99) */}
-            <div className="bg-gradient-to-b from-[#2a0b52] to-[#180430] border-2 border-yellow-400/90 rounded-2xl p-5 flex flex-col justify-between relative shadow-xl shadow-yellow-500/10 transition-all">
+            <div className="bg-gradient-to-b from-[#2a0b52] to-[#180430] border-2 border-yellow-400/90 rounded-2xl p-4 flex flex-col justify-between relative shadow-xl shadow-yellow-500/10 transition-all">
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-yellow-300 flex items-center gap-1">
-                    <Crown className="w-3.5 h-3.5 fill-current" />
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-yellow-300 flex items-center gap-1">
+                    <Crown className="w-3 h-3 fill-current" />
                     Mais Escolhido
                   </span>
                   {(user?.role === 'master' || user?.planStatus === 'unlimited' || user?.planStatus === 'pro') && (
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-yellow-400/20 text-yellow-300 border border-yellow-400/40">
+                    <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-yellow-400/20 text-yellow-300 border border-yellow-400/40">
                       Plano Ativo
                     </span>
                   )}
                 </div>
-                <h3 className="text-lg font-black text-white">Plano Ouro</h3>
-                <p className="text-[11px] text-purple-200 mt-0.5">Tudo liberado sem nenhuma restrição</p>
+                <h3 className="text-base font-black text-white">Plano Ouro</h3>
+                <p className="text-[10px] text-purple-200 mt-0.5">Tudo liberado sem nenhuma restrição</p>
 
-                <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60 flex flex-col justify-center">
+                <div className="mt-2 mb-3 pb-2 border-b border-purple-800/60 flex flex-col justify-center">
                   <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-black text-yellow-400 tracking-tight">
                       R$ {billingCycle === 'monthly' ? '18,99' : '189,90'}
@@ -303,24 +303,24 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                   </div>
                 </div>
 
-                <ul className="space-y-2.5 text-xs text-purple-100">
-                  <li className="flex items-center gap-2">
+                <ul className="space-y-1.5 text-[11px] text-purple-100">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-yellow-400 shrink-0" />
                     <span><strong className="text-white">Quizzes ilimitados</strong> no mês</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-yellow-400 shrink-0" />
                     <span><strong className="text-white">Participantes ilimitados</strong> na sala</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Criador de Quizzes Inteligente com IA</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Histórico completo de partidas</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Suporte prioritário via WhatsApp</span>
                   </li>

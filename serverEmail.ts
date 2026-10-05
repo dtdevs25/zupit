@@ -32,7 +32,7 @@ const getEmailTemplate = (content: string) => `
 </head>
 <body>
   <div class="container">
-    <img src="https://zupit.com.br/superiortrofeu.png" alt="ZUPiT!" class="logo" />
+    <img src="${BASE_URL}/esquerdatrofeu.png" alt="ZUPiT!" class="logo" />
     <div class="divider"></div>
     <div class="content">
       ${content}

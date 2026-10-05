@@ -4,6 +4,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { AIGeneratorModal } from '../../QuizManager/AIGeneratorModal';
 import { QuizBuilder } from '../../QuizManager/QuizBuilder';
 import { ConfirmModal } from '../../ConfirmModal';
+import { AlertModal } from '../../AlertModal';
 import { Quiz } from '../../../types';
 
 interface AdminQuiz {
@@ -28,6 +29,14 @@ export function QuizzesManagement() {
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
   const [quizToDelete, setQuizToDelete] = useState<AdminQuiz | null>(null);
+
+  const [alertConfig, setAlertConfig] = useState<{isOpen: boolean; type: 'success' | 'error'; title: string; message: string}>({
+    isOpen: false, type: 'success', title: '', message: ''
+  });
+
+  const showAlert = (type: 'success' | 'error', title: string, message: string) => {
+    setAlertConfig({ isOpen: true, type, title, message });
+  };
 
   const fetchQuizzes = async () => {
     try {
@@ -84,9 +93,9 @@ export function QuizzesManagement() {
     }
   };
 
-  const handleSaveQuiz = async (newQuiz: Quiz) => {
+    const handleSaveQuiz = async (newQuiz: Quiz) => {
     try {
-      await fetch('/api/quizzes', {
+      const res = await fetch('/api/quizzes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,10 +103,13 @@ export function QuizzesManagement() {
         },
         body: JSON.stringify({ quiz: newQuiz })
       });
+      if (!res.ok) throw new Error('Falha ao salvar quiz');
       fetchQuizzes();
       setIsBuilderOpen(false);
+      showAlert('success', 'Sucesso!', 'Quiz salvo com sucesso.');
     } catch (e) {
       console.error('Error saving quiz', e);
+      showAlert('error', 'Erro', 'Ocorreu um erro ao salvar o quiz.');
     }
   };
 
@@ -235,6 +247,14 @@ export function QuizzesManagement() {
         confirmText="Sim, Excluir Quiz"
         onConfirm={confirmDeleteQuiz}
         onCancel={() => setQuizToDelete(null)}
+      />
+
+      <AlertModal
+        isOpen={alertConfig.isOpen}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
       />
     </div>
   );

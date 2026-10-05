@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Settings, Save, ShieldCheck, Globe, Database, Clock, Users, Zap, MessageCircle } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import { AlertModal } from '../../AlertModal';
+
 export function SettingsManagement() {
   const { token } = useAuth();
   const [platformName, setPlatformName] = useState('');
@@ -14,7 +16,16 @@ export function SettingsManagement() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{type: 'success'|'error', text: string} | null>(null);
+  const [alertConfig, setAlertConfig] = useState<{isOpen: boolean; type: 'success' | 'error' | 'warning' | 'info'; title: string; message: string}>({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    message: ''
+  });
+
+  const showAlert = (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => {
+    setAlertConfig({ isOpen: true, type, title, message });
+  };
 
   useEffect(() => {
     fetch('/api/admin/settings', {
@@ -38,7 +49,6 @@ export function SettingsManagement() {
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setMessage(null);
     
     try {
       const res = await fetch('/api/admin/settings', {
@@ -55,13 +65,12 @@ export function SettingsManagement() {
         })
       });
       if (res.ok) {
-        setMessage({ type: 'success', text: 'Configurações globais salvas com sucesso!' });
-        setTimeout(() => setMessage(null), 3000);
+        showAlert('success', 'Configurações Salvas', 'As configurações globais foram salvas com sucesso.');
       } else {
-        setMessage({ type: 'error', text: 'Erro ao salvar.' });
+        showAlert('error', 'Erro', 'Erro ao salvar configurações.');
       }
     } catch {
-      setMessage({ type: 'error', text: 'Erro de conexão.' });
+      showAlert('error', 'Erro', 'Erro de conexão.');
     } finally {
       setSaving(false);
     }
@@ -76,15 +85,6 @@ export function SettingsManagement() {
           <h1 className="text-3xl font-black text-white">Configurações Globais</h1>
         </div>
       </header>
-
-      {message && (
-        <div className={`p-4 rounded-xl border font-bold flex items-center gap-2 animate-fadeIn ${
-          message.type === 'success' ? 'bg-green-900/50 border-green-500 text-green-300' : 'bg-red-900/50 border-red-500 text-red-300'
-        }`}>
-          {message.type === 'success' && <ShieldCheck className="w-5 h-5" />}
-          {message.text}
-        </div>
-      )}
 
       <div className="grid grid-cols-1 gap-6">
         {/* Global Settings */}
@@ -236,6 +236,14 @@ export function SettingsManagement() {
           </form>
         </div>
       </div>
+
+      <AlertModal
+        isOpen={alertConfig.isOpen}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+      />
     </div>
   );
 }

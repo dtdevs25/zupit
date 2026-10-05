@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const BASE_URL = process.env.PUBLIC_URL || 'https://zupit.com.br';
+const BASE_URL = process.env.PUBLIC_URL || 'https://zupit.ehspro.com.br';
 
 const getEmailTemplate = (content: string) => `
 <!DOCTYPE html>

@@ -419,7 +419,7 @@ export async function getAllUsersAdmin(): Promise<UserAccount[]> {
   return res.rows.map(mapDbToUser);
 }
 
-export async function getAdminMetrics(): Promise<AdminMetrics> {
+export async function getAdminMetrics(): Promise<any> {
   const res = await pool.query('SELECT * FROM users');
   const users = res.rows;
   
@@ -430,7 +430,33 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
   const totalQuizzesHosted = users.reduce((acc, u) => acc + (u.quizzes_hosted_count || 0), 0);
   const totalRevenueSimulated = Number(((basicUsers * 8.99) + (proUsers * 18.99)).toFixed(2));
 
-  return { totalUsers, freeTrialUsers, basicUsers, proUsers, totalQuizzesHosted, totalRevenueSimulated };
+  // Generate basic usage history from users creation and quizzes
+  const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+  const logsRes = await pool.query('SELECT action, created_at FROM system_logs WHERE created_at > $1 ORDER BY created_at ASC', [thirtyDaysAgo]);
+  
+  const historyMap = new Map<string, { date: string, signups: number, quizzes: number }>();
+  
+  // Initialize last 7 days
+  for(let i=6; i>=0; i--) {
+    const d = new Date(Date.now() - (i * 24 * 60 * 60 * 1000));
+    const dateStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}`;
+    historyMap.set(dateStr, { date: dateStr, signups: 0, quizzes: 0 });
+  }
+
+  logsRes.rows.forEach(log => {
+    const d = new Date(Number(log.created_at));
+    const dateStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}`;
+    if (!historyMap.has(dateStr)) {
+      historyMap.set(dateStr, { date: dateStr, signups: 0, quizzes: 0 });
+    }
+    const entry = historyMap.get(dateStr)!;
+    if (log.action === 'USER_REGISTERED') entry.signups++;
+    if (log.action === 'QUIZ_HOSTED' || log.action === 'QUIZ_SAVED') entry.quizzes++;
+  });
+
+  const usageHistory = Array.from(historyMap.values()).slice(-7); // take last 7 days
+
+  return { totalUsers, freeTrialUsers, basicUsers, proUsers, totalQuizzesHosted, totalRevenueSimulated, usageHistory };
 }
 
 // --- Quiz CRUD ---

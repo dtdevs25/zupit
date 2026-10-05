@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Users, FileText, CreditCard, Activity, DollarSign } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 interface Metrics {
   totalUsers: number;
@@ -9,6 +10,7 @@ interface Metrics {
   proUsers: number;
   totalQuizzesHosted: number;
   totalRevenueSimulated: number;
+  usageHistory?: Array<{ date: string, signups: number, quizzes: number }>;
 }
 
 export function Overview() {
@@ -48,6 +50,8 @@ export function Overview() {
     { label: 'Receita Simulada', value: `R$ ${(metrics?.totalRevenueSimulated || 0).toFixed(2)}`, icon: CreditCard, color: 'text-green-400', bg: 'bg-green-400/10' },
   ];
 
+  const chartData = metrics?.usageHistory || [];
+
   return (
     <div className="space-y-6">
       <header>
@@ -72,14 +76,33 @@ export function Overview() {
         })}
       </div>
 
-      {/* Placeholder for Charts / Recent Activity */}
+      {/* Charts & Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-        <div className="lg:col-span-2 bg-[#2b0e5c] border border-purple-800 rounded-2xl p-6 h-96 flex flex-col justify-center items-center">
-          <Activity className="w-16 h-16 text-purple-700 mb-4" />
-          <h3 className="text-xl font-bold text-purple-300">Gráfico de Uso (Em Breve)</h3>
-          <p className="text-sm text-purple-400 text-center mt-2 max-w-sm">
-            Aqui você visualizará as métricas detalhadas de acesso e criação de partidas no decorrer do tempo.
-          </p>
+        <div className="lg:col-span-2 bg-[#2b0e5c] border border-purple-800 rounded-2xl p-6 h-96 flex flex-col">
+          <h3 className="text-lg font-bold text-white mb-6">Gráfico de Uso (Últimos 7 Dias)</h3>
+          <div className="flex-1 w-full h-full min-h-0">
+            {chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                  <Line type="monotone" dataKey="quizzes" stroke="#c084fc" name="Quizzes Criados/Jogados" strokeWidth={3} dot={{ r: 4, fill: '#c084fc' }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="signups" stroke="#60a5fa" name="Novos Cadastros" strokeWidth={3} dot={{ r: 4, fill: '#60a5fa' }} />
+                  <CartesianGrid stroke="#4c1d95" strokeDasharray="5 5" vertical={false} />
+                  <XAxis dataKey="date" stroke="#a78bfa" tick={{ fill: '#a78bfa' }} tickMargin={10} axisLine={false} tickLine={false} />
+                  <YAxis stroke="#a78bfa" tick={{ fill: '#a78bfa' }} axisLine={false} tickLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1a0a33', borderColor: '#6b21a8', borderRadius: '8px', color: '#fff' }}
+                    itemStyle={{ color: '#fff' }}
+                  />
+                  <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-purple-400">
+                <Activity className="w-12 h-12 mb-2 opacity-50" />
+                <p>Nenhum dado recente encontrado.</p>
+              </div>
+            )}
+          </div>
         </div>
         
         <div className="bg-[#2b0e5c] border border-purple-800 rounded-2xl p-6 flex flex-col">

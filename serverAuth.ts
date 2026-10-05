@@ -206,6 +206,7 @@ export async function registerUser(name: string, email: string, password: string
 
   const user = mapDbToUser(row);
   const token = generateToken(user.id);
+  await logSystemAction(user.id, 'REGISTER', `Usuário cadastrado: ${user.email}`);
   return { user, token };
 }
 
@@ -234,6 +235,7 @@ export async function loginUser(email: string, password?: string, skipPasswordFo
 
   const user = mapDbToUser(dbUser);
   const token = generateToken(user.id);
+  await logSystemAction(user.id, 'LOGIN', `Usuário fez login.`);
   return { user, token };
 }
 
@@ -439,6 +441,7 @@ export async function saveQuiz(userId: string, quiz: any) {
     }
     
     await client.query('COMMIT');
+    await logSystemAction(userId, 'QUIZ_SAVED', `Quiz "${quiz.title}" atualizado/criado.`);
   } catch (e) {
     await client.query('ROLLBACK');
     throw e;
@@ -446,6 +449,38 @@ export async function saveQuiz(userId: string, quiz: any) {
     client.release();
   }
 }
+export async function getAllQuizzesForMasterPlay() {
+  const quizzesRes = await pool.query(`
+    SELECT * FROM quizzes 
+    ORDER BY updated_at DESC
+  `);
+  let quizzes = quizzesRes.rows;
+  
+  const result = [];
+  for (const q of quizzes) {
+    const questionsRes = await pool.query('SELECT * FROM questions WHERE quiz_id = $1 ORDER BY order_index ASC', [q.id]);
+    result.push({
+      id: q.id,
+      title: q.title,
+      description: q.description,
+      category: q.category,
+      coverEmoji: q.cover_emoji,
+      isPublic: q.is_public,
+      isOwner: true, // Master can edit all
+      questions: questionsRes.rows.map(row => ({
+        id: row.id,
+        text: row.text,
+        type: row.type,
+        timeLimit: row.time_limit,
+        points: row.points,
+        options: row.options,
+        correctAnswer: row.correct_answer_index
+      }))
+    });
+  }
+  return result;
+}
+
 
 export async function getQuizzesByUser(userId: string) {
   const quizzesRes = await pool.query(`
@@ -484,6 +519,7 @@ export async function getQuizzesByUser(userId: string) {
 
 export async function deleteQuiz(userId: string, quizId: string) {
   await pool.query('DELETE FROM quizzes WHERE id = $1 AND user_id = $2', [quizId, userId]);
+  await logSystemAction(userId, 'QUIZ_DELETED', `Quiz ${quizId} removido pelo usuário.`);
 }
 
 export async function getAllQuizzesAdmin() {
@@ -516,6 +552,7 @@ export async function getAllQuizzesAdmin() {
 
 export async function deleteQuizByAdmin(quizId: string) {
   await pool.query('DELETE FROM quizzes WHERE id = $1', [quizId]);
+  await logSystemAction(null, 'QUIZ_DELETED_ADMIN', `Quiz ${quizId} removido pelo Admin.`);
 }
 
 export async function toggleQuizPublicStatus(quizId: string, isPublic: boolean) {

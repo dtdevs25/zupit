@@ -21,6 +21,7 @@ import {
   getAdminMetrics,
   saveQuiz,
   getQuizzesByUser,
+  getAllQuizzesForMasterPlay,
   deleteQuiz,
   getAllQuizzesAdmin,
   deleteQuizByAdmin,
@@ -1335,7 +1336,13 @@ app.get('/api/quizzes', async (req, res) => {
   if (!user) return res.status(401).json({ error: 'Usuario invalido' });
   
   try {
-    const quizzes = await getQuizzesByUser(user.id);
+    let quizzes;
+    if (user.role === 'master') {
+      // Master can see all quizzes
+      quizzes = await getAllQuizzesForMasterPlay();
+    } else {
+      quizzes = await getQuizzesByUser(user.id);
+    }
     res.json({ quizzes });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

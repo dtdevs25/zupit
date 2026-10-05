@@ -1172,6 +1172,14 @@ app.get('/api/admin/logs', async (req, res) => {
   res.json({ logs: await getSystemLogsAdmin() });
 });
 
+app.get('/api/settings/public', async (req, res) => {
+  const settings = await getPlatformSettings();
+  res.json({ 
+    whatsapp_number: settings.whatsapp_number,
+    whatsapp_greeting: settings.whatsapp_greeting 
+  });
+});
+
 app.get('/api/admin/settings', async (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
@@ -1185,8 +1193,8 @@ app.post('/api/admin/settings', async (req, res) => {
   const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
   const user = token ? await getUserByToken(token) : null;
   if (!user || user.role !== 'master') return res.status(403).json({ error: 'Acesso restrito.' });
-  const { name, free_limit, default_time, max_participants, allow_ai } = req.body;
-  await updatePlatformSettings(name, free_limit, default_time, max_participants, allow_ai);
+  const { name, free_limit, default_time, max_participants, allow_ai, whatsapp_number, whatsapp_greeting } = req.body;
+  await updatePlatformSettings(name, free_limit, default_time, max_participants, allow_ai, whatsapp_number, whatsapp_greeting);
   await logSystemAction(user.id, 'SETTINGS_UPDATED', `Configurações globais atualizadas: ${name}`);
   res.json({ success: true });
 });

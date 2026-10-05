@@ -1,16 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export const WhatsAppWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const [config, setConfig] = useState({ number: '5519991472282', greeting: 'Olá! Como podemos te ajudar com o ZUPiT! hoje?' });
+  const { user } = useAuth();
+
+  useEffect(() => {
+    fetch('/api/settings/public')
+      .then(res => res.json())
+      .then(data => {
+        setConfig({
+          number: data.whatsapp_number || '5519991472282',
+          greeting: data.whatsapp_greeting || 'Olá! Como podemos te ajudar com o ZUPiT! hoje?'
+        });
+      })
+      .catch(console.error);
+  }, []);
+
+  // Ocultar widget para o usuário Master
+  if (user?.role === 'master') return null;
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
-    // Substitua pelo número real do WhatsApp (ex: 5511999999999)
-    const phoneNumber = "5519991472282";
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    
+    // Remover tudo que não for número
+    const cleanNumber = config.number.replace(/\D/g, '');
+    const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
     setIsOpen(false);
     setMessage('');
@@ -35,8 +54,8 @@ export const WhatsAppWidget: React.FC = () => {
           </div>
 
           <div className="p-4 bg-gray-50 h-32 overflow-y-auto">
-            <div className="bg-white p-3 rounded-lg rounded-tl-none shadow-sm text-sm text-gray-700 max-w-[85%]">
-              Olá! Como podemos te ajudar com o ZUPiT! hoje?
+            <div className="bg-white p-3 rounded-lg rounded-tl-none shadow-sm text-sm text-gray-700 max-w-[85%] whitespace-pre-wrap">
+              {config.greeting}
             </div>
           </div>
 

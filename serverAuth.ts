@@ -77,11 +77,15 @@ export async function initDb() {
         free_limit INT NOT NULL,
         default_time INT NOT NULL,
         max_participants INT DEFAULT 15,
-        allow_ai BOOLEAN DEFAULT true
+        allow_ai BOOLEAN DEFAULT true,
+        whatsapp_number VARCHAR(50),
+        whatsapp_greeting TEXT
       );
       
       ALTER TABLE platform_settings ADD COLUMN IF NOT EXISTS max_participants INT DEFAULT 15;
       ALTER TABLE platform_settings ADD COLUMN IF NOT EXISTS allow_ai BOOLEAN DEFAULT true;
+      ALTER TABLE platform_settings ADD COLUMN IF NOT EXISTS whatsapp_number VARCHAR(50) DEFAULT '5519991472282';
+      ALTER TABLE platform_settings ADD COLUMN IF NOT EXISTS whatsapp_greeting TEXT DEFAULT 'Olá! Como podemos te ajudar com o ZUPiT! hoje?';
     `);
     
     // Create or update master user
@@ -604,23 +608,39 @@ export async function getSystemLogsAdmin() {
 export async function getPlatformSettings() {
   const res = await pool.query('SELECT * FROM platform_settings LIMIT 1');
   if (res.rows.length === 0) {
-    return { name: 'Zupit Master', free_limit: 10, default_time: 20, max_participants: 15, allow_ai: true };
+    return { 
+      name: 'Zupit Master', 
+      free_limit: 10, 
+      default_time: 20, 
+      max_participants: 15, 
+      allow_ai: true,
+      whatsapp_number: '5519991472282',
+      whatsapp_greeting: 'Olá! Como podemos te ajudar com o ZUPiT! hoje?'
+    };
   }
   return res.rows[0];
 }
 
-export async function updatePlatformSettings(name: string, freeLimit: number, defaultTime: number, maxParticipants: number = 15, allowAI: boolean = true) {
+export async function updatePlatformSettings(
+  name: string, 
+  freeLimit: number, 
+  defaultTime: number, 
+  maxParticipants: number = 15, 
+  allowAI: boolean = true,
+  whatsappNumber: string = '5519991472282',
+  whatsappGreeting: string = 'Olá! Como podemos te ajudar com o ZUPiT! hoje?'
+) {
   const res = await pool.query('SELECT * FROM platform_settings LIMIT 1');
   if (res.rows.length === 0) {
     await pool.query(`
-      INSERT INTO platform_settings (id, name, free_limit, default_time, max_participants, allow_ai)
-      VALUES ($1, $2, $3, $4, $5, $6)
-    `, [crypto.randomUUID(), name, freeLimit, defaultTime, maxParticipants, allowAI]);
+      INSERT INTO platform_settings (id, name, free_limit, default_time, max_participants, allow_ai, whatsapp_number, whatsapp_greeting)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `, [crypto.randomUUID(), name, freeLimit, defaultTime, maxParticipants, allowAI, whatsappNumber, whatsappGreeting]);
   } else {
     await pool.query(`
       UPDATE platform_settings
-      SET name = $1, free_limit = $2, default_time = $3, max_participants = $4, allow_ai = $5
-      WHERE id = $6
-    `, [name, freeLimit, defaultTime, maxParticipants, allowAI, res.rows[0].id]);
+      SET name = $1, free_limit = $2, default_time = $3, max_participants = $4, allow_ai = $5, whatsapp_number = $6, whatsapp_greeting = $7
+      WHERE id = $8
+    `, [name, freeLimit, defaultTime, maxParticipants, allowAI, whatsappNumber, whatsappGreeting, res.rows[0].id]);
   }
 }

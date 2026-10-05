@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Save, ShieldCheck, Globe, Database, Clock, Users, Zap } from 'lucide-react';
+import { Settings, Save, ShieldCheck, Globe, Database, Clock, Users, Zap, MessageCircle } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 export function SettingsManagement() {
   const { token } = useAuth();
@@ -9,6 +9,8 @@ export function SettingsManagement() {
   // Novos parametros
   const [maxParticipantsFree, setMaxParticipantsFree] = useState(15);
   const [allowAI, setAllowAI] = useState(true);
+  const [whatsappNumber, setWhatsappNumber] = useState('');
+  const [whatsappGreeting, setWhatsappGreeting] = useState('');
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -26,6 +28,8 @@ export function SettingsManagement() {
       // Se não vier do backend (pq a tabela não tem as colunas novas ainda), a gente usa os states
       if (data.max_participants !== undefined) setMaxParticipantsFree(data.max_participants);
       if (data.allow_ai !== undefined) setAllowAI(data.allow_ai);
+      if (data.whatsapp_number !== undefined) setWhatsappNumber(data.whatsapp_number);
+      if (data.whatsapp_greeting !== undefined) setWhatsappGreeting(data.whatsapp_greeting);
       setLoading(false);
     })
     .catch(() => setLoading(false));
@@ -45,7 +49,9 @@ export function SettingsManagement() {
           free_limit: freeLimit, 
           default_time: defaultTime,
           max_participants: maxParticipantsFree,
-          allow_ai: allowAI
+          allow_ai: allowAI,
+          whatsapp_number: whatsappNumber,
+          whatsapp_greeting: whatsappGreeting
         })
       });
       if (res.ok) {
@@ -173,6 +179,44 @@ export function SettingsManagement() {
                   <div className="w-11 h-6 bg-purple-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-400"></div>
                 </label>
               </div>
+
+              {/* Whatsapp Settings */}
+              <div className="md:col-span-2 pt-4 border-t border-purple-800/50 mt-2">
+                <div className="flex items-center gap-2 mb-6">
+                  <MessageCircle className="w-5 h-5 text-[#25D366]" />
+                  <h3 className="text-lg font-bold text-white">Configurações do WhatsApp</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-purple-300 mb-2">
+                      Número do WhatsApp (com código do país)
+                    </label>
+                    <div className="relative">
+                      <MessageCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" />
+                      <input
+                        type="text"
+                        value={whatsappNumber}
+                        onChange={(e) => setWhatsappNumber(e.target.value)}
+                        placeholder="Ex: 5519991472282"
+                        className="w-full bg-[#1a0a33] border border-purple-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-purple-300 mb-2">
+                      Mensagem de Saudação Automática
+                    </label>
+                    <textarea
+                      value={whatsappGreeting}
+                      onChange={(e) => setWhatsappGreeting(e.target.value)}
+                      placeholder="Olá! Como podemos te ajudar?"
+                      rows={3}
+                      className="w-full bg-[#1a0a33] border border-purple-700 rounded-xl p-3 text-white focus:outline-none focus:border-purple-500 transition-colors resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             <div className="pt-4 flex justify-end">

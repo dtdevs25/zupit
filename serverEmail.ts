@@ -84,7 +84,7 @@ export const sendWelcomeEmail = async (email: string, name: string, tempPassword
 export const sendPasswordResetEmail = async (email: string, name: string, resetToken: string) => {
   try {
     const firstName = name.split(' ')[0] || 'Aventureiro';
-    const resetUrl = \`\${BASE_URL}/reset-password?token=\${resetToken}\`;
+    const resetUrl = `${BASE_URL}/reset-password?token=${resetToken}`;
     
     const content = `
       <h2 style="color: #4c1d95; margin-bottom: 15px;">Ops, esqueceu a senha, ${firstName}? 😅</h2>

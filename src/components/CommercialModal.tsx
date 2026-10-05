@@ -88,9 +88,9 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
         </div>
 
         {/* Content body */}
-        <div className="p-3 sm:p-5 space-y-4 overflow-y-auto flex-1">
+        <div className="p-3 sm:p-4 space-y-3 overflow-y-auto flex-1">
           {/* Billing Cycle Toggle */}
-          <div className="flex justify-center mb-6 mt-2">
+          <div className="flex justify-center mb-4 mt-1">
             <div className="bg-purple-900/40 p-1 rounded-full border border-purple-800/60 inline-flex relative">
               <button
                 onClick={() => setBillingCycle('monthly')}
@@ -120,38 +120,12 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
             </div>
           )}
 
-          {/* User status alert if logged in */}
-          {user && (
-            <div className="bg-purple-950/70 p-3.5 rounded-xl border border-purple-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-purple-200">
-                  Conta: <strong className="text-white">{user.name}</strong> <span className="text-purple-400">({user.email})</span>
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-purple-400">Plano ativo:</span>
-                <span className="font-bold text-yellow-300">
-                  {user.role === 'master'
-                    ? '👑 Master Total'
-                    : user.planStatus === 'unlimited' || user.planStatus === 'pro'
-                    ? 'Pacote Master (Ilimitado)'
-                    : user.planStatus === 'basic'
-                    ? `Pacote Básico (${user.paidCredits} quizzes no mês)`
-                    : user.paidCredits > 0
-                    ? `${user.paidCredits} Créditos`
-                    : user.freeTrialUsed
-                    ? 'Teste Gratuito Esgotado'
-                    : '1 Quiz Gratuito (15 participantes)'}
-                </span>
-              </div>
-            </div>
-          )}
+
 
           {/* Pricing cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-4">
             {/* Free Trial Card */}
-            <div className="bg-[#19052f] border border-purple-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-purple-600/80 transition-all">
+            <div className="bg-[#19052f] border border-purple-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-purple-600/80 transition-all">
               <div>
                 <div className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-1">
                   Teste Inicial
@@ -213,7 +187,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
             </div>
 
             {/* Basic Plan (R$ 8,99) */}
-            <div className={`bg-[#1c0638] rounded-2xl p-5 flex flex-col justify-between transition-all relative ${
+            <div className={`bg-[#1c0638] rounded-2xl p-4 flex flex-col justify-between transition-all relative ${
               user?.planStatus === 'basic' ? 'border-2 border-indigo-400 shadow-lg shadow-indigo-500/10' : 'border border-purple-600/70 hover:border-purple-400'
             }`}>
               <div>

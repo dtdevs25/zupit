@@ -70,6 +70,18 @@ export async function initDb() {
         details TEXT,
         created_at BIGINT NOT NULL
       );
+
+      CREATE TABLE IF NOT EXISTS platform_settings (
+        id VARCHAR(255) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        free_limit INT NOT NULL,
+        default_time INT NOT NULL,
+        max_participants INT DEFAULT 15,
+        allow_ai BOOLEAN DEFAULT true
+      );
+      
+      ALTER TABLE platform_settings ADD COLUMN IF NOT EXISTS max_participants INT DEFAULT 15;
+      ALTER TABLE platform_settings ADD COLUMN IF NOT EXISTS allow_ai BOOLEAN DEFAULT true;
     `);
     
     // Create or update master user
@@ -587,4 +599,28 @@ export async function getSystemLogsAdmin() {
     details: r.details,
     createdAt: Number(r.created_at)
   }));
+}
+
+export async function getPlatformSettings() {
+  const res = await pool.query('SELECT * FROM platform_settings LIMIT 1');
+  if (res.rows.length === 0) {
+    return { name: 'Zupit Master', free_limit: 10, default_time: 20, max_participants: 15, allow_ai: true };
+  }
+  return res.rows[0];
+}
+
+export async function updatePlatformSettings(name: string, freeLimit: number, defaultTime: number, maxParticipants: number = 15, allowAI: boolean = true) {
+  const res = await pool.query('SELECT * FROM platform_settings LIMIT 1');
+  if (res.rows.length === 0) {
+    await pool.query(`
+      INSERT INTO platform_settings (id, name, free_limit, default_time, max_participants, allow_ai)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `, [crypto.randomUUID(), name, freeLimit, defaultTime, maxParticipants, allowAI]);
+  } else {
+    await pool.query(`
+      UPDATE platform_settings
+      SET name = $1, free_limit = $2, default_time = $3, max_participants = $4, allow_ai = $5
+      WHERE id = $6
+    `, [name, freeLimit, defaultTime, maxParticipants, allowAI, res.rows[0].id]);
+  }
 }

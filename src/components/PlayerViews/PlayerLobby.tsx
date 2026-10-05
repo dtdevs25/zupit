@@ -71,10 +71,10 @@ export const PlayerLobby: React.FC<PlayerLobbyProps> = ({
   return (
     <div className="flex flex-col items-center justify-center h-full flex-1 overflow-y-auto w-full px-4 text-center">
       {/* Custom Character Avatar */}
-      <div className="mb-3 animate-bounce-short relative group flex flex-col items-center">
+      <div className="mb-2 animate-bounce-short relative group flex flex-col items-center">
         <CharacterAvatar
           config={characterConfig}
-          size={96}
+          size={72}
           animate
           className="border-4 border-yellow-400 shadow-2xl"
         />
@@ -103,7 +103,7 @@ export const PlayerLobby: React.FC<PlayerLobbyProps> = ({
         </div>
       </div>
 
-      <div className="bg-[#321066] border border-purple-700/60 rounded-3xl p-5 sm:p-7 max-w-sm w-full shadow-2xl flex flex-col items-center">
+      <div className="bg-[#321066] border border-purple-700/60 rounded-3xl p-4 sm:p-5 max-w-sm w-full shadow-2xl flex flex-col items-center">
         <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-green-400 bg-green-950/60 px-3 py-1 rounded-full border border-green-700/60 mb-3">
           <CheckCircle2 className="w-3.5 h-3.5" />
           Conectado

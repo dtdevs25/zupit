@@ -28,6 +28,9 @@ import {
   toggleQuizPublicStatus,
   getSystemLogsAdmin,
   logSystemAction,
+  getPlatformSettings,
+  updatePlatformSettings,
+  changeUserPasswordByAdmin
   changeUserPasswordByAdmin
 } from './serverAuth.ts';
 
@@ -1167,6 +1170,25 @@ app.get('/api/admin/logs', async (req, res) => {
     return res.status(403).json({ error: 'Acesso restrito ao Usuário Master.' });
   }
   res.json({ logs: await getSystemLogsAdmin() });
+});
+
+app.get('/api/admin/settings', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
+  const user = token ? await getUserByToken(token) : null;
+  if (!user || user.role !== 'master') return res.status(403).json({ error: 'Acesso restrito.' });
+  res.json(await getPlatformSettings());
+});
+
+app.post('/api/admin/settings', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
+  const user = token ? await getUserByToken(token) : null;
+  if (!user || user.role !== 'master') return res.status(403).json({ error: 'Acesso restrito.' });
+  const { name, free_limit, default_time, max_participants, allow_ai } = req.body;
+  await updatePlatformSettings(name, free_limit, default_time, max_participants, allow_ai);
+  await logSystemAction(user.id, 'SETTINGS_UPDATED', `Configurações globais atualizadas: ${name}`);
+  res.json({ success: true });
 });
 
 app.get('/api/admin/quizzes', async (req, res) => {

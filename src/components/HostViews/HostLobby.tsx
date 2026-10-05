@@ -36,8 +36,8 @@ export const HostLobby: React.FC<HostLobbyProps> = ({
   return (
     <div className="flex flex-col items-center justify-between h-full flex-1 overflow-y-auto w-full max-w-6xl mx-auto px-4 py-6">
       {/* Top Banner: Join instructions */}
-      <div className="w-full bg-[#321066] border border-purple-700/60 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex flex-col items-center md:items-start text-center md:text-left">
+      <div className="w-full bg-[#321066] border border-purple-700/60 rounded-3xl p-4 sm:p-6 shadow-2xl flex flex-col xl:flex-row items-center justify-between gap-4">
+        <div className="flex flex-col items-center xl:items-start text-center xl:text-left">
           <span className="text-sm sm:text-base font-extrabold text-purple-300 uppercase tracking-widest">
             Acesse no celular ou aba:
           </span>
@@ -53,10 +53,10 @@ export const HostLobby: React.FC<HostLobbyProps> = ({
         <div className="flex items-center gap-4 sm:gap-6">
           <div 
             onClick={copyPin}
-            className="bg-white hover:bg-yellow-50 text-[#321066] cursor-pointer px-6 sm:px-10 py-3 sm:py-5 rounded-2xl shadow-xl flex items-center gap-4 transition-transform active:scale-95 group"
+            className="bg-white hover:bg-yellow-50 text-[#321066] cursor-pointer px-4 sm:px-6 py-2 sm:py-3 rounded-2xl shadow-xl flex items-center gap-3 transition-transform active:scale-95 group"
             title="Clique para copiar o PIN"
           >
-            <span className="font-mono font-black text-4xl sm:text-6xl tracking-widest text-[#240b4d]">
+            <span className="font-mono font-black text-3xl sm:text-5xl xl:text-6xl tracking-widest text-[#240b4d] whitespace-nowrap">
               {formattedPin}
             </span>
             <button className="text-purple-600 group-hover:text-purple-900 transition-colors hidden sm:block">
@@ -64,10 +64,10 @@ export const HostLobby: React.FC<HostLobbyProps> = ({
             </button>
           </div>
 
-          <div className="bg-white p-2 sm:p-3 rounded-2xl shadow-xl flex flex-col items-center">
+          <div className="bg-white p-2 rounded-2xl shadow-xl flex flex-col items-center">
             <QRCodeSVG 
               value={joinUrl} 
-              size={112}
+              size={90}
               bgColor="#ffffff" 
               fgColor="#321066"
               level="M"

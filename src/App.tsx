@@ -255,8 +255,8 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-[#46178f] text-white flex flex-col font-['Montserrat',sans-serif]">
-      {/* Global Header (Hidden during game) */}
-      {!activeRoom && (
+      {/* Global Header (Hidden during game or split mode selection) */}
+      {!activeRoom && !isSplitModePending && (
         <Header
           pin={socket.pin}
           soundEnabled={socket.soundEnabled}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Volume2, VolumeX, HelpCircle, Columns, LogOut, Sparkles, Crown, User, Tv } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { ProfileModal } from './ProfileModal';
 
 interface HeaderProps {
   pin?: string | null;
@@ -30,6 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
   onGoToHost,
 }) => {
   const [showHelp, setShowHelp] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const { user, isMaster, allowance, logout } = useAuth();
 
   return (
@@ -77,7 +79,10 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center font-bold text-[10px] text-white">
                 {isMaster ? '👑' : user.name.slice(0, 1).toUpperCase()}
               </div>
-              <div className="hidden md:flex flex-col text-left leading-tight">
+              <div 
+                className="hidden md:flex flex-col text-left leading-tight cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => setShowProfile(true)}
+              >
                 <span className="font-bold text-gray-900 max-w-[100px] truncate">{user.name}</span>
                 <span className="text-[10px] text-purple-600">
                   {user.planStatus === 'pro' || user.planStatus === 'unlimited'
@@ -215,6 +220,14 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
         </div>
+      )}
+
+      {/* Profile Modal */}
+      {showProfile && (
+        <ProfileModal 
+          isOpen={showProfile} 
+          onClose={() => setShowProfile(false)} 
+        />
       )}
     </>
   );

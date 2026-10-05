@@ -91,16 +91,16 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
         <div className="p-3 sm:p-4 space-y-3 overflow-y-auto flex-1">
           {/* Billing Cycle Toggle */}
           <div className="flex justify-center mb-4 mt-1">
-            <div className="bg-purple-900/40 p-1 rounded-full border border-purple-800/60 inline-flex relative">
+            <div className="bg-purple-900/40 p-1 rounded-full border border-purple-800/60 inline-flex relative w-64">
               <button
                 onClick={() => setBillingCycle('monthly')}
-                className={`relative z-10 px-6 py-2 text-xs font-bold rounded-full transition-colors ${billingCycle === 'monthly' ? 'text-white' : 'text-purple-400 hover:text-purple-200'}`}
+                className={`relative z-10 w-1/2 py-2 text-xs font-bold rounded-full transition-colors ${billingCycle === 'monthly' ? 'text-white' : 'text-purple-400 hover:text-purple-200'}`}
               >
                 Mensal
               </button>
               <button
                 onClick={() => setBillingCycle('annual')}
-                className={`relative z-10 px-6 py-2 text-xs font-bold rounded-full transition-colors flex items-center gap-1.5 ${billingCycle === 'annual' ? 'text-white' : 'text-purple-400 hover:text-purple-200'}`}
+                className={`relative z-10 w-1/2 py-2 text-xs font-bold rounded-full transition-colors flex items-center justify-center gap-1.5 ${billingCycle === 'annual' ? 'text-white' : 'text-purple-400 hover:text-purple-200'}`}
               >
                 Anual
                 <span className="bg-green-500 text-white text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-black -mt-2">Desconto</span>
@@ -108,7 +108,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
               
               {/* Sliding background indicator */}
               <div 
-                className={`absolute top-1 bottom-1 w-1/2 bg-purple-600 rounded-full shadow-md transition-transform duration-300 ease-in-out ${billingCycle === 'annual' ? 'translate-x-full left-[-4px]' : 'translate-x-0 left-1'}`}
+                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-purple-600 rounded-full shadow-md transition-transform duration-300 ease-in-out ${billingCycle === 'annual' ? 'translate-x-[calc(100%+2px)]' : 'translate-x-0'} left-1`}
               />
             </div>
           </div>

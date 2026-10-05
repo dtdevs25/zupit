@@ -98,17 +98,7 @@ export const PaywallNoticeModal: React.FC<PaywallNoticeModalProps> = ({
               >
                 Criar Conta ou Entrar
               </button>
-            ) : (
-              <button
-                onClick={async () => {
-                  await quickLoginMaster();
-                  onClose();
-                }}
-                className="w-full py-1.5 text-purple-400 hover:text-purple-200 text-xs font-medium cursor-pointer"
-              >
-                Acessar Painel Master
-              </button>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

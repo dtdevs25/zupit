@@ -165,10 +165,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
               <button
                 type="button"
                 onClick={handlePasswordReset}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors"
+                className="w-full bg-purple-100 hover:bg-purple-200 text-purple-700 border border-purple-200 font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
               >
-                <Key className="w-4 h-4" />
-                <span>Solicitar link para criar/redefinir senha</span>
+                <Key className="w-5 h-5" />
+                <span>Solicitar link para redefinir senha</span>
               </button>
             </div>
           </div>

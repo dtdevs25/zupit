@@ -23,7 +23,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
   const bgClass = type === 'success' ? 'bg-green-500/20 border-green-500/50' : type === 'error' ? 'bg-red-500/20 border-red-500/50' : 'bg-blue-500/20 border-blue-500/50';
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="bg-[#240b4d] border border-purple-600 rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden relative animate-in fade-in zoom-in duration-200">
         <button
           onClick={onClose}

@@ -69,7 +69,7 @@ export const PlayerLobby: React.FC<PlayerLobbyProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] w-full px-4 text-center">
+    <div className="flex flex-col items-center justify-center h-full flex-1 overflow-y-auto w-full px-4 text-center">
       {/* Custom Character Avatar */}
       <div className="mb-3 animate-bounce-short relative group flex flex-col items-center">
         <CharacterAvatar

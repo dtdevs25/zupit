@@ -80,6 +80,8 @@ function AppContent() {
   // Navigation
   const [currentView, setCurrentView] = useState<'landing' | 'home' | 'quizzes' | 'split'>('landing');
   const [urlPin, setUrlPin] = useState<string>('');
+  const [isSplitModePending, setIsSplitModePending] = useState(false);
+  const [splitModeQuiz, setSplitModeQuiz] = useState<Quiz | null>(null);
 
   // Modals
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
@@ -105,7 +107,8 @@ function AppContent() {
       }
       const splitParam = params.get('split');
       if (splitParam === 'true') {
-        setCurrentView('split');
+        setIsSplitModePending(true);
+        setCurrentView('quizzes');
       }
     }
   }, []);
@@ -211,6 +214,12 @@ function AppContent() {
     // If user context is loaded and allowance is denied (and not master) — show paywall
     if (user && allowance && !allowance.allowed && !isMaster) {
       setIsPaywallNoticeOpen(true);
+      return;
+    }
+
+    if (isSplitModePending) {
+      setSplitModeQuiz(quiz);
+      setCurrentView('split');
       return;
     }
 
@@ -387,8 +396,8 @@ function AppContent() {
         ) : (
           // Pre-game Screens
           <>
-            {currentView === 'split' ? (
-              <SplitScreenView onClose={() => { window.location.href = '/admin'; }} />
+            {currentView === 'split' && splitModeQuiz ? (
+              <SplitScreenView quiz={splitModeQuiz} onClose={() => { window.location.href = '/admin'; }} />
             ) : currentView === 'quizzes' ? (
               <QuizSelector
                 quizzes={quizzes}

@@ -16,7 +16,7 @@ export const HostReveal: React.FC<HostRevealProps> = ({ room, onNextStage }) => 
   const maxVotes = Math.max(1, ...distribution);
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-65px)] w-full max-w-6xl mx-auto px-4 py-4 justify-between">
+    <div className="flex flex-col h-full flex-1 overflow-y-auto w-full max-w-6xl mx-auto px-4 py-4 justify-between">
       {/* Top Header */}
       <div className="flex items-center justify-between gap-4 mb-2">
         <span className="bg-[#321066] border border-purple-700/60 px-4 py-1.5 rounded-full font-black text-xs sm:text-sm text-yellow-300 uppercase tracking-wider">

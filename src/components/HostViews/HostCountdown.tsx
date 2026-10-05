@@ -7,7 +7,7 @@ interface HostCountdownProps {
 
 export const HostCountdown: React.FC<HostCountdownProps> = ({ room }) => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] w-full px-4 text-center select-none">
+    <div className="flex flex-col items-center justify-center h-full flex-1 overflow-y-auto w-full px-4 text-center select-none">
       <span className="text-xl sm:text-2xl font-black text-purple-300 uppercase tracking-widest mb-3">
         Pergunta {room.currentQuestionIndex + 1} de {room.totalQuestions}
       </span>

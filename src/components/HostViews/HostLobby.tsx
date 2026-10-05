@@ -34,7 +34,7 @@ export const HostLobby: React.FC<HostLobbyProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-between min-h-[calc(100vh-65px)] w-full max-w-6xl mx-auto px-4 py-6">
+    <div className="flex flex-col items-center justify-between h-full flex-1 overflow-y-auto w-full max-w-6xl mx-auto px-4 py-6">
       {/* Top Banner: Join instructions */}
       <div className="w-full bg-[#321066] border border-purple-700/60 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex flex-col items-center md:items-start text-center md:text-left">

@@ -22,7 +22,7 @@ export const PlayerLeaderboard: React.FC<PlayerLeaderboardProps> = ({ player, ro
     : 0;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] w-full px-4 text-center animate-fadeIn">
+    <div className="flex flex-col items-center justify-center h-full flex-1 overflow-y-auto w-full px-4 text-center animate-fadeIn">
       <div className="bg-[#240b4d] border-2 border-purple-600/70 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl flex flex-col items-center relative overflow-hidden backdrop-blur-md">
         {/* Subtle decorative background glow */}
         <div

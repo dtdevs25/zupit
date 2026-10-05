@@ -18,7 +18,7 @@ export const HostQuestion: React.FC<HostQuestionProps> = ({ room, onSkipQuestion
   const isWarning = timeRemaining <= 5;
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-65px)] w-full max-w-6xl mx-auto px-4 py-4 justify-between">
+    <div className="flex flex-col h-full flex-1 overflow-y-auto w-full max-w-6xl mx-auto px-4 py-4 justify-between">
       {/* Top Header info */}
       <div className="flex items-center justify-between gap-4 mb-2">
         <div className="flex items-center gap-3">

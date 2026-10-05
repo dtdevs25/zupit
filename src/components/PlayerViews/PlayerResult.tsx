@@ -22,7 +22,7 @@ export const PlayerResult: React.FC<PlayerResultProps> = ({ player, lastResult }
 
   return (
     <div
-      className={`flex flex-col items-center justify-center min-h-[calc(100vh-65px)] w-full px-4 text-center text-white transition-colors duration-500 ${
+      className={`flex flex-col items-center justify-center h-full flex-1 overflow-y-auto w-full px-4 text-center text-white transition-colors duration-500 ${
         isCorrect ? 'bg-[#26890c]' : 'bg-[#e21b3c]'
       }`}
     >

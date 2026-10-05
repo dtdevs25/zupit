@@ -98,7 +98,7 @@ export const HostLeaderboard: React.FC<HostLeaderboardProps> = ({ room, onNextSt
   }, null);
 
   return (
-    <div className="relative flex flex-col min-h-[calc(100vh-65px)] w-full max-w-5xl mx-auto px-4 py-4 sm:py-6 justify-between animate-fadeIn overflow-hidden">
+    <div className="relative flex flex-col h-full flex-1 overflow-y-auto w-full max-w-5xl mx-auto px-4 py-4 sm:py-6 justify-between animate-fadeIn overflow-hidden">
       {/* Kahoot Ambient Floating Background Geometric Shapes */}
       <div className="absolute inset-0 pointer-events-none opacity-10 flex justify-between">
         <span className="text-8xl text-red-500 font-bold select-none translate-x-4 translate-y-12">▲</span>

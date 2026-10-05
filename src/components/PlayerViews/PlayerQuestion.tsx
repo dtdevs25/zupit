@@ -29,7 +29,7 @@ export const PlayerQuestion: React.FC<PlayerQuestionProps> = ({
 
   if (hasAnswered || selectedIndex !== null) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] w-full px-4 text-center">
+      <div className="flex flex-col items-center justify-center h-full flex-1 overflow-y-auto w-full px-4 text-center">
         <div className="bg-[#321066] border border-purple-700/60 rounded-3xl p-8 max-w-sm w-full shadow-2xl flex flex-col items-center animate-fadeIn">
           <div className="w-16 h-16 rounded-full bg-yellow-400 text-purple-950 flex items-center justify-center font-black mb-4 shadow-lg animate-pulse">
             <Check className="w-8 h-8 stroke-[3]" />
@@ -57,7 +57,7 @@ export const PlayerQuestion: React.FC<PlayerQuestionProps> = ({
   }
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-65px)] w-full p-2 sm:p-4 justify-between">
+    <div className="flex flex-col h-full flex-1 overflow-y-auto w-full p-2 sm:p-4 justify-between">
       {/* Mini top bar with question number & timer */}
       <div className="w-full flex items-center justify-between px-2 py-1 mb-2">
         <span className="font-black text-xs sm:text-sm text-yellow-300 uppercase tracking-wider">

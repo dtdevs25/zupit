@@ -28,7 +28,7 @@ export const PlayerPodium: React.FC<PlayerPodiumProps> = ({ player, room, onLeav
   }, [isPodium, playGameEvent]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] w-full px-4 text-center">
+    <div className="flex flex-col items-center justify-center h-full flex-1 overflow-y-auto w-full px-4 text-center">
       <div className="bg-[#321066] border border-purple-700/60 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl flex flex-col items-center animate-fadeIn">
         {/* Badge */}
         <div className="relative mb-4">

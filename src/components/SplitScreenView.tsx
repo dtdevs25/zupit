@@ -18,10 +18,11 @@ import { CHARACTER_PRESETS } from './CharacterAvatar';
 import { Smartphone, Monitor, Bot, Sparkles, X, Palette } from 'lucide-react';
 
 interface SplitScreenViewProps {
+  quiz: Quiz;
   onClose: () => void;
 }
 
-export const SplitScreenView: React.FC<SplitScreenViewProps> = ({ onClose }) => {
+export const SplitScreenView: React.FC<SplitScreenViewProps> = ({ quiz, onClose }) => {
   // Host connection
   const host = useQuizSocket();
   // Player connection
@@ -33,23 +34,16 @@ export const SplitScreenView: React.FC<SplitScreenViewProps> = ({ onClose }) => 
   // Create room on mount if not yet created
   React.useEffect(() => {
     if (host.isConnected && !host.pin) {
-      host.createRoom(DEFAULT_QUIZZES[0]);
+      host.createRoom(quiz);
     }
-  }, [host.isConnected, host.pin]);
+  }, [host.isConnected, host.pin, quiz]);
 
-  // Join player automatically once host room is ready, and populate with test players
+  // Join player automatically once host room is ready
   React.useEffect(() => {
     if (host.pin && player.isConnected && !player.pin) {
-      player.joinRoom(host.pin, 'Você (Jogador) 📱', '🦊', '#e21b3c', playerCharacter);
-      // Automatically add bots after a brief moment so the user immediately sees competitors in the test
-      const botTimer = setTimeout(() => {
-        if (host.room?.state === 'LOBBY') {
-          host.addBots(4);
-        }
-      }, 600);
-      return () => clearTimeout(botTimer);
+      player.joinRoom(host.pin, 'Seu Celular 📱', '🦊', '#e21b3c', playerCharacter);
     }
-  }, [host.pin, player.isConnected, player.pin, host.room?.state, host.addBots]);
+  }, [host.pin, player.isConnected, player.pin, playerCharacter]);
 
   const handleUpdateAvatar = (newConfig: CharacterConfig, newNickname?: string) => {
     setPlayerCharacter(newConfig);
@@ -61,15 +55,15 @@ export const SplitScreenView: React.FC<SplitScreenViewProps> = ({ onClose }) => 
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-65px)] w-full overflow-hidden bg-[#1f073d]">
+    <div className="fixed inset-0 z-[100] flex flex-col w-screen h-screen overflow-hidden bg-[#1f073d]">
       {/* Top Banner for Split Screen */}
-      <div className="bg-[#2a0c54] border-b border-purple-800 px-4 py-2 flex items-center justify-between text-xs text-purple-200">
+      <div className="bg-[#2a0c54] border-b border-purple-800 px-4 py-2 flex items-center justify-between text-xs text-purple-200 shrink-0">
         <div className="flex items-center gap-2">
           <span className="px-2 py-0.5 rounded bg-yellow-400 text-purple-950 font-black uppercase text-[10px]">
-            Modo Teste Dividido
+            Modo Apresentador (Split)
           </span>
           <span className="hidden sm:inline">
-            Veja a tela do Host (esquerda) e o celular do Jogador (direita) sincronizados em tempo real!
+            Apresente na tela principal e acompanhe seu painel de jogador ao lado. Outros jogadores podem entrar normalmente!
           </span>
         </div>
 
@@ -89,7 +83,7 @@ export const SplitScreenView: React.FC<SplitScreenViewProps> = ({ onClose }) => 
             className="flex items-center gap-1 text-purple-300 hover:text-white font-bold bg-purple-900/60 px-2.5 py-1 rounded-lg border border-purple-700/60 transition-colors cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
-            <span>Sair do Modo Teste</span>
+            <span>Sair do Jogo</span>
           </button>
         </div>
       </div>

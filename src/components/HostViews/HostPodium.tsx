@@ -51,7 +51,7 @@ export const HostPodium: React.FC<HostPodiumProps> = ({
   }, []);
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-65px)] w-full max-w-5xl mx-auto px-4 py-6 justify-between items-center text-center">
+    <div className="flex flex-col h-full flex-1 overflow-y-auto w-full max-w-5xl mx-auto px-4 py-6 justify-between items-center text-center">
       {/* Title */}
       <div>
         <div className="inline-flex items-center gap-2 bg-yellow-400 text-purple-950 px-4 py-1.5 rounded-full font-black text-xs uppercase tracking-widest mb-2 shadow-lg animate-bounce-short">

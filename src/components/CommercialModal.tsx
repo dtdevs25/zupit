@@ -141,11 +141,12 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                 <h3 className="text-lg font-black text-white">Plano Grátis</h3>
                 <p className="text-[11px] text-purple-300 mt-0.5">Para experimentar a plataforma</p>
 
-                <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60">
+                <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60 flex flex-col justify-center">
                   <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-black text-white tracking-tight">R$ 0</span>
                     <span className="text-[11px] text-purple-400 font-medium">/ 1 quiz</span>
                   </div>
+                  <div className="text-[10px] opacity-0 mt-1 pointer-events-none select-none">.</div>
                 </div>
 
                 <ul className="space-y-2.5 text-xs text-purple-200">
@@ -212,7 +213,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                 <h3 className="text-lg font-black text-white">Plano Prata</h3>
                 <p className="text-[11px] text-purple-300 mt-0.5">Para professores e salas de aula</p>
 
-                <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60">
+                <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60 flex flex-col justify-center">
                   <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-black text-white tracking-tight">
                       R$ {billingCycle === 'monthly' ? '8,99' : '89,90'}
@@ -221,9 +222,9 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                       / {billingCycle === 'monthly' ? 'mês' : 'ano'}
                     </span>
                   </div>
-                  {billingCycle === 'annual' && (
-                    <div className="text-[10px] text-green-400 font-bold mt-1">Equivale a R$ 7,49 por mês</div>
-                  )}
+                  <div className={`text-[10px] text-green-400 font-bold mt-1 transition-opacity ${billingCycle === 'annual' ? 'opacity-100' : 'opacity-0 select-none'}`}>
+                    Equivale a R$ 7,49 por mês
+                  </div>
                 </div>
 
                 <ul className="space-y-2.5 text-xs text-purple-200">
@@ -288,7 +289,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                 <h3 className="text-lg font-black text-white">Plano Ouro</h3>
                 <p className="text-[11px] text-purple-200 mt-0.5">Tudo liberado sem nenhuma restrição</p>
 
-                <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60">
+                <div className="mt-3 mb-4 pb-3 border-b border-purple-800/60 flex flex-col justify-center">
                   <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-black text-yellow-400 tracking-tight">
                       R$ {billingCycle === 'monthly' ? '18,99' : '189,90'}
@@ -297,9 +298,9 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
                       / {billingCycle === 'monthly' ? 'mês' : 'ano'}
                     </span>
                   </div>
-                  {billingCycle === 'annual' && (
-                    <div className="text-[10px] text-green-400 font-bold mt-1">Equivale a R$ 15,82 por mês</div>
-                  )}
+                  <div className={`text-[10px] text-green-400 font-bold mt-1 transition-opacity ${billingCycle === 'annual' ? 'opacity-100' : 'opacity-0 select-none'}`}>
+                    Equivale a R$ 15,82 por mês
+                  </div>
                 </div>
 
                 <ul className="space-y-2.5 text-xs text-purple-100">

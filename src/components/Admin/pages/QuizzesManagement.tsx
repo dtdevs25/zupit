@@ -175,7 +175,7 @@ export function QuizzesManagement() {
             <Plus className="w-5 h-5" /> Novo Quiz
           </button>
           <button 
-            onClick={fetchQuizzes}
+            onClick={fetchQuizzesAndUsers}
             className="bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 px-4 py-2 rounded-xl font-bold transition-colors flex items-center gap-2"
           >
             <RefreshCw className="w-5 h-5" />

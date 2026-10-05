@@ -6,6 +6,7 @@ import { QuizBuilder } from '../../QuizManager/QuizBuilder';
 import { ConfirmModal } from '../../ConfirmModal';
 import { AlertModal } from '../../AlertModal';
 import { Quiz } from '../../../types';
+import { UserAccount } from '../../../types/auth';
 
 interface AdminQuiz {
   id: string;
@@ -23,12 +24,15 @@ interface AdminQuiz {
 export function QuizzesManagement() {
   const { token, user } = useAuth();
   const [quizzes, setQuizzes] = useState<AdminQuiz[]>([]);
+  const [users, setUsers] = useState<UserAccount[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
   const [quizToDelete, setQuizToDelete] = useState<AdminQuiz | null>(null);
+  const [quizToTransfer, setQuizToTransfer] = useState<AdminQuiz | null>(null);
+  const [transferTargetUserId, setTransferTargetUserId] = useState<string>('');
 
   const [alertConfig, setAlertConfig] = useState<{isOpen: boolean; type: 'success' | 'error'; title: string; message: string}>({
     isOpen: false, type: 'success', title: '', message: ''
@@ -38,18 +42,20 @@ export function QuizzesManagement() {
     setAlertConfig({ isOpen: true, type, title, message });
   };
 
-  const fetchQuizzes = async () => {
+  const fetchQuizzesAndUsers = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/admin/quizzes', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.quizzes) {
-        setQuizzes(data.quizzes);
-      }
+      const [qRes, uRes] = await Promise.all([
+        fetch('/api/admin/quizzes', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } })
+      ]);
+      const qData = await qRes.json();
+      const uData = await uRes.json();
+      
+      if (qData.quizzes) setQuizzes(qData.quizzes);
+      if (uData.users) setUsers(uData.users);
     } catch (err) {
-      console.error('Error fetching quizzes', err);
+      console.error('Error fetching data', err);
     } finally {
       setLoading(false);
     }
@@ -57,7 +63,7 @@ export function QuizzesManagement() {
 
   useEffect(() => {
     if (token) {
-      fetchQuizzes();
+      fetchQuizzesAndUsers();
     }
   }, [token]);
 
@@ -68,7 +74,7 @@ export function QuizzesManagement() {
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ isPublic: !quiz.isPublic })
       });
-      fetchQuizzes();
+      fetchQuizzesAndUsers();
     } catch (err) {
       console.error('Error toggling public status', err);
     }
@@ -85,7 +91,7 @@ export function QuizzesManagement() {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      fetchQuizzes();
+      fetchQuizzesAndUsers();
     } catch (err) {
       console.error('Error deleting quiz', err);
     } finally {
@@ -104,7 +110,7 @@ export function QuizzesManagement() {
         body: JSON.stringify({ quiz: newQuiz })
       });
       if (!res.ok) throw new Error('Falha ao salvar quiz');
-      fetchQuizzes();
+      fetchQuizzesAndUsers();
       setIsBuilderOpen(false);
       showAlert('success', 'Sucesso!', 'Quiz salvo com sucesso.');
     } catch (e) {
@@ -115,6 +121,30 @@ export function QuizzesManagement() {
 
   const handleQuizGenerated = async (newQuiz: Quiz) => {
     await handleSaveQuiz(newQuiz);
+  };
+
+  const confirmTransferQuiz = async () => {
+    if (!quizToTransfer || !transferTargetUserId) return;
+    try {
+      const res = await fetch(`/api/admin/quizzes/${quizToTransfer.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ ownerId: transferTargetUserId })
+      });
+      if (!res.ok) throw new Error('Erro ao transferir quiz');
+      
+      showAlert('success', 'Sucesso!', `Quiz transferido com sucesso.`);
+      fetchQuizzesAndUsers();
+    } catch (err) {
+      console.error(err);
+      showAlert('error', 'Erro', 'Falha ao transferir o quiz.');
+    } finally {
+      setQuizToTransfer(null);
+      setTransferTargetUserId('');
+    }
   };
 
   if (loading && quizzes.length === 0) {
@@ -200,19 +230,25 @@ export function QuizzesManagement() {
                     </button>
                   </td>
                   <td className="p-4 text-right">
-                    <button 
-                      onClick={() => {
-                        // Quick edit for master users: we can construct a partial Quiz object. 
-                        // However, /api/admin/quizzes does not return full questions array.
-                        // For a complete edit, we might need to fetch the full quiz first.
-                        // Since this is MVP, we'll just allow deletion or toggle public here.
-                        handleDelete(quiz)
-                      }}
-                      className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors" 
-                      title="Excluir Definitivamente"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex justify-end gap-2">
+                      <button 
+                        onClick={() => {
+                          setQuizToTransfer(quiz);
+                          setTransferTargetUserId(quiz.ownerId);
+                        }}
+                        className="px-3 py-1 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg transition-colors text-xs font-bold" 
+                        title="Vincular a Usuário"
+                      >
+                        Vincular
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(quiz)}
+                        className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors" 
+                        title="Excluir Definitivamente"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -248,6 +284,43 @@ export function QuizzesManagement() {
         onConfirm={confirmDeleteQuiz}
         onCancel={() => setQuizToDelete(null)}
       />
+
+      {/* Transfer Quiz Modal */}
+      {quizToTransfer && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#240b4d] border border-purple-600 rounded-3xl w-full max-w-sm shadow-2xl p-6 relative animate-in fade-in zoom-in duration-200">
+            <h2 className="text-xl font-black text-white mb-4">Vincular Quiz</h2>
+            <p className="text-sm text-purple-200 mb-6">Selecione o novo proprietário do quiz "{quizToTransfer.title}":</p>
+            
+            <select
+              value={transferTargetUserId}
+              onChange={(e) => setTransferTargetUserId(e.target.value)}
+              className="w-full bg-[#1a0a33] border border-purple-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-purple-500 mb-6"
+            >
+              <option value="">Selecione um usuário...</option>
+              {users.map(u => (
+                <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+              ))}
+            </select>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setQuizToTransfer(null)}
+                className="flex-1 py-3 rounded-xl bg-purple-900/50 hover:bg-purple-800 text-white font-bold transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmTransferQuiz}
+                disabled={!transferTargetUserId || transferTargetUserId === quizToTransfer.ownerId}
+                className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold transition-colors"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <AlertModal
         isOpen={alertConfig.isOpen}

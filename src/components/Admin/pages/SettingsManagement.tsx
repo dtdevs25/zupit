@@ -13,6 +13,7 @@ export function SettingsManagement() {
   const [allowAI, setAllowAI] = useState(true);
   const [whatsappNumber, setWhatsappNumber] = useState('');
   const [whatsappGreeting, setWhatsappGreeting] = useState('');
+  const [maxQuestions, setMaxQuestions] = useState(50);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -41,6 +42,7 @@ export function SettingsManagement() {
       if (data.allow_ai !== undefined) setAllowAI(data.allow_ai);
       if (data.whatsapp_number !== undefined) setWhatsappNumber(data.whatsapp_number);
       if (data.whatsapp_greeting !== undefined) setWhatsappGreeting(data.whatsapp_greeting);
+      if (data.max_questions !== undefined) setMaxQuestions(data.max_questions);
       setLoading(false);
     })
     .catch(() => setLoading(false));
@@ -61,7 +63,8 @@ export function SettingsManagement() {
           max_participants: maxParticipantsFree,
           allow_ai: allowAI,
           whatsapp_number: whatsappNumber,
-          whatsapp_greeting: whatsappGreeting
+          whatsapp_greeting: whatsappGreeting,
+          max_questions: maxQuestions
         })
       });
       if (res.ok) {
@@ -156,6 +159,21 @@ export function SettingsManagement() {
                     type="number"
                     value={maxParticipantsFree}
                     onChange={(e) => setMaxParticipantsFree(Number(e.target.value))}
+                    className="w-full bg-[#1a0a33] border border-purple-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-purple-300 mb-2">
+                  Máximo de Perguntas por Quiz
+                </label>
+                <div className="relative">
+                  <Database className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" />
+                  <input
+                    type="number"
+                    value={maxQuestions}
+                    onChange={(e) => setMaxQuestions(Number(e.target.value))}
                     className="w-full bg-[#1a0a33] border border-purple-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-purple-500 transition-colors"
                   />
                 </div>

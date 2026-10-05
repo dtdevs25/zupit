@@ -1235,8 +1235,8 @@ app.post('/api/admin/settings', async (req, res) => {
   const token = authHeader ? authHeader.replace(/^Bearer\s+/, '') : '';
   const user = token ? await getUserByToken(token) : null;
   if (!user || user.role !== 'master') return res.status(403).json({ error: 'Acesso restrito.' });
-  const { name, free_limit, default_time, max_participants, allow_ai, whatsapp_number, whatsapp_greeting } = req.body;
-  await updatePlatformSettings(name, free_limit, default_time, max_participants, allow_ai, whatsapp_number, whatsapp_greeting);
+  const { name, free_limit, default_time, max_participants, allow_ai, whatsapp_number, whatsapp_greeting, max_questions } = req.body;
+  await updatePlatformSettings(name, free_limit, default_time, max_participants, allow_ai, whatsapp_number, whatsapp_greeting, max_questions);
   await logSystemAction(user.id, 'SETTINGS_UPDATED', `Configurações globais atualizadas: ${name}`);
   res.json({ success: true });
 });
@@ -1274,8 +1274,14 @@ app.patch('/api/admin/quizzes/:id', async (req, res) => {
     return res.status(403).json({ error: 'Acesso restrito ao Usuário Master.' });
   }
   try {
-    const { isPublic } = req.body;
-    await toggleQuizPublicStatus(req.params.id, isPublic);
+    const { isPublic, ownerId } = req.body;
+    if (isPublic !== undefined) {
+      await toggleQuizPublicStatus(req.params.id, isPublic);
+    }
+    if (ownerId !== undefined) {
+      const { changeQuizOwnerAdmin } = await import('./serverAuth.ts');
+      await changeQuizOwnerAdmin(req.params.id, ownerId);
+    }
     res.json({ success: true });
   } catch (err: any) {
     res.status(400).json({ error: err.message });

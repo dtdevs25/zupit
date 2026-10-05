@@ -91,6 +91,7 @@ export async function initDb() {
       ALTER TABLE platform_settings ADD COLUMN IF NOT EXISTS allow_ai BOOLEAN DEFAULT true;
       ALTER TABLE platform_settings ADD COLUMN IF NOT EXISTS whatsapp_number VARCHAR(50) DEFAULT '5519991472282';
       ALTER TABLE platform_settings ADD COLUMN IF NOT EXISTS whatsapp_greeting TEXT DEFAULT 'Olá! Como podemos te ajudar com o ZUPiT! hoje?';
+      ALTER TABLE platform_settings ADD COLUMN IF NOT EXISTS max_questions INT DEFAULT 50;
     `);
     
     // Create or update master user
@@ -603,6 +604,14 @@ export async function toggleQuizPublicStatus(quizId: string, isPublic: boolean) 
   await pool.query('UPDATE quizzes SET is_public = $1 WHERE id = $2', [isPublic, quizId]);
 }
 
+export async function changeQuizOwnerAdmin(quizId: string, newOwnerId: string) {
+  // Verifique se o usuário existe
+  const res = await pool.query('SELECT id FROM users WHERE id = $1', [newOwnerId]);
+  if (res.rows.length === 0) throw new Error('Usuário não encontrado.');
+  await pool.query('UPDATE quizzes SET user_id = $1 WHERE id = $2', [newOwnerId, quizId]);
+  await logSystemAction(null, 'QUIZ_OWNER_CHANGED', `Quiz ${quizId} transferido para usuário ${newOwnerId}.`);
+}
+
 export async function logSystemAction(userId: string | null, action: string, details: string = '') {
   try {
     await pool.query(`
@@ -643,7 +652,8 @@ export async function getPlatformSettings() {
       max_participants: 15, 
       allow_ai: true,
       whatsapp_number: '5519991472282',
-      whatsapp_greeting: 'Olá! Como podemos te ajudar com o ZUPiT! hoje?'
+      whatsapp_greeting: 'Olá! Como podemos te ajudar com o ZUPiT! hoje?',
+      max_questions: 50
     };
   }
   return res.rows[0];
@@ -656,19 +666,20 @@ export async function updatePlatformSettings(
   maxParticipants: number = 15, 
   allowAI: boolean = true,
   whatsappNumber: string = '5519991472282',
-  whatsappGreeting: string = 'Olá! Como podemos te ajudar com o ZUPiT! hoje?'
+  whatsappGreeting: string = 'Olá! Como podemos te ajudar com o ZUPiT! hoje?',
+  maxQuestions: number = 50
 ) {
   const res = await pool.query('SELECT * FROM platform_settings LIMIT 1');
   if (res.rows.length === 0) {
     await pool.query(`
-      INSERT INTO platform_settings (id, name, free_limit, default_time, max_participants, allow_ai, whatsapp_number, whatsapp_greeting)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    `, [crypto.randomUUID(), name, freeLimit, defaultTime, maxParticipants, allowAI, whatsappNumber, whatsappGreeting]);
+      INSERT INTO platform_settings (id, name, free_limit, default_time, max_participants, allow_ai, whatsapp_number, whatsapp_greeting, max_questions)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `, [crypto.randomUUID(), name, freeLimit, defaultTime, maxParticipants, allowAI, whatsappNumber, whatsappGreeting, maxQuestions]);
   } else {
     await pool.query(`
       UPDATE platform_settings
-      SET name = $1, free_limit = $2, default_time = $3, max_participants = $4, allow_ai = $5, whatsapp_number = $6, whatsapp_greeting = $7
-      WHERE id = $8
-    `, [name, freeLimit, defaultTime, maxParticipants, allowAI, whatsappNumber, whatsappGreeting, res.rows[0].id]);
+      SET name = $1, free_limit = $2, default_time = $3, max_participants = $4, allow_ai = $5, whatsapp_number = $6, whatsapp_greeting = $7, max_questions = $8
+      WHERE id = $9
+    `, [name, freeLimit, defaultTime, maxParticipants, allowAI, whatsappNumber, whatsappGreeting, maxQuestions, res.rows[0].id]);
   }
 }

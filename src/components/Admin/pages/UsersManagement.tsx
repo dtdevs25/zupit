@@ -145,17 +145,26 @@ export function UsersManagement() {
   };
 
   const handleSendResetEmail = async (user: UserAccount) => {
-    // In a real app, this would call /api/admin/users/:id/send-reset-email
-    // For MVP, we simulate success and show a manual link in case SMTP is not configured.
-    const fakeResetLink = `https://zupit.com.br/reset-password?token=mock_${Math.random().toString(36).substring(7)}`;
-    
-    showAlert(
-      'success',
-      'E-mail Enviado!',
-      `O link de redefinição de senha foi enviado para ${user.email}.\n\nCaso o usuário não receba, você pode enviar este link manualmente:\n${fakeResetLink}`
-    );
+    try {
+      const res = await fetch('/api/auth/request-password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email })
+      });
+      const data = await res.json();
+      
+      if (!res.ok) throw new Error(data.error || 'Erro ao enviar e-mail');
+      
+      showAlert(
+        'success',
+        'E-mail Enviado!',
+        `O link de redefinição de senha foi enviado com sucesso para o e-mail: ${user.email}`
+      );
+    } catch (err: any) {
+      console.error(err);
+      showAlert('error', 'Erro', err.message || 'Ocorreu um erro ao enviar o e-mail.');
+    }
   };
-
   const confirmDeleteUser = async () => {
     if (!userToDelete) return;
     try {

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Save, ShieldCheck, Globe, Database, Clock } from 'lucide-react';
 import { Settings, Save, ShieldCheck, Globe, Database, Clock, Users, Zap } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 export function SettingsManagement() {

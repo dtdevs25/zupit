@@ -69,10 +69,10 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn">
-      <div className="bg-[#200742] border-2 border-purple-700/80 rounded-3xl max-w-4xl w-full flex flex-col text-white shadow-2xl relative overflow-hidden">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 z-50 animate-fadeIn">
+      <div className="bg-[#200742] border-2 border-purple-700/80 rounded-3xl max-w-5xl w-full max-h-[95vh] flex flex-col text-white shadow-2xl relative overflow-hidden">
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-purple-800/80 flex items-center justify-between bg-[#190533]">
+        <div className="p-4 border-b border-purple-800/80 flex items-center justify-between bg-[#190533] shrink-0">
           <div>
             <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-yellow-400 block">
               Planos & Preços
@@ -88,7 +88,7 @@ export const CommercialModal: React.FC<CommercialModalProps> = ({
         </div>
 
         {/* Content body */}
-        <div className="p-4 sm:p-5 space-y-4">
+        <div className="p-3 sm:p-5 space-y-4 overflow-y-auto flex-1">
           {/* Billing Cycle Toggle */}
           <div className="flex justify-center mb-6 mt-2">
             <div className="bg-purple-900/40 p-1 rounded-full border border-purple-800/60 inline-flex relative">

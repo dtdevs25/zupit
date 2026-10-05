@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, User, Mail, ShieldAlert, Key, Save } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { AlertModal } from './Admin/components/AlertModal';
+import { AlertModal } from './AlertModal';
 
 interface ProfileModalProps {
   isOpen: boolean;
